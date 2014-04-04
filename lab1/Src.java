@@ -39,7 +39,7 @@ class IValue extends Value {
 //        |  Expr == Expr
 
 abstract class Expr {
-  abstract Value eval(Memory mem);
+  abstract Value eval(Env env);
   abstract String show();
 }
 
@@ -47,7 +47,7 @@ class Var extends Expr {
   private String name;
   Var(String name) { this.name = name; }
 
-  Value eval(Memory mem) { return mem.load(name); }
+  Value eval(Env env) { return mem.load(name); }
   String show() { return name; }
 }
 
@@ -55,7 +55,7 @@ class Int extends Expr {
   private int num;
   Int(int num) { this.num = num; }
 
-  Value eval(Memory mem) { return new IValue(num); }
+  Value eval(Env env) { return new IValue(num); }
   String show() { return Integer.toString(num); }
 }
 
@@ -63,7 +63,7 @@ class Mult extends Expr {
   private Expr l, r;
   Mult(Expr l, Expr r) { this.l = l; this.r = r; }
 
-  Value eval(Memory mem) { return new IValue(l.eval(mem).asInt() * r.eval(mem).asInt()); }
+  Value eval(Env env) { return new IValue(l.eval(env).asInt() * r.eval(env).asInt()); }
   String show() { return "(" + l.show() + " * " + r.show() + ")"; }
 }
 
@@ -71,7 +71,7 @@ class Plus extends Expr {
   private Expr l, r;
   Plus(Expr l, Expr r) { this.l = l; this.r = r; }
 
-  Value eval(Memory mem) { return new IValue(l.eval(mem).asInt() + r.eval(mem).asInt()); }
+  Value eval(Env env) { return new IValue(l.eval(env).asInt() + r.eval(env).asInt()); }
   String show() { return "(" + l.show() + " + " + r.show() + ")"; }
 }
 
@@ -79,7 +79,7 @@ class Minus extends Expr {
   private Expr l, r;
   Minus(Expr l, Expr r) { this.l = l; this.r = r; }
 
-  Value eval(Memory mem) { return new IValue(l.eval(mem).asInt()- r.eval(mem).asInt()); }
+  Value eval(Env env) { return new IValue(l.eval(env).asInt()- r.eval(env).asInt()); }
   String show() { return "(" + l.show() + " - " + r.show() + ")"; }
 }
 
@@ -87,7 +87,7 @@ class LT extends Expr {
   private Expr l, r;
   LT(Expr l, Expr r) { this.l = l; this.r = r; }
 
-  Value eval(Memory mem) { return new BValue(l.eval(mem).asInt() < r.eval(mem).asInt()); }
+  Value eval(Env env) { return new BValue(l.eval(env).asInt() < r.eval(env).asInt()); }
   String show()  { return "(" + l.show() + " < " + r.show() + ")"; }
 }
 
@@ -95,7 +95,7 @@ class EqEq extends Expr {
   private Expr l, r;
   EqEq(Expr l, Expr r) { this.l = l; this.r = r; }
 
-  Value eval(Memory mem) { return new BValue(l.eval(mem).asInt() == r.eval(mem).asInt()); }
+  Value eval(Env env) { return new BValue(l.eval(env).asInt() == r.eval(env).asInt()); }
   String show()  { return "(" + l.show() + " == " + r.show() + ")"; }
 }
 
@@ -107,7 +107,7 @@ class EqEq extends Expr {
 //        |  Print Expr
 
 abstract class Stmt {
-  abstract void exec(Memory mem);
+  abstract void exec(Env env);
   abstract void print(int ind);
 
   static void indent(int ind) {
@@ -121,9 +121,9 @@ class Seq extends Stmt {
   private Stmt l, r;
   Seq(Stmt l, Stmt r) { this.l = l; this.r = r; }
 
-  void exec(Memory mem) {
-    l.exec(mem);
-    r.exec(mem);
+  void exec(Env env) {
+    l.exec(env);
+    r.exec(env);
   }
 
   void print(int ind) {
@@ -139,8 +139,8 @@ class Assign extends Stmt {
     this.lhs = lhs; this.rhs = rhs;
   }
 
-  void exec(Memory mem) {
-    mem.store(lhs, rhs.eval(mem));
+  void exec(Env env) {
+    mem.store(lhs, rhs.eval(env));
   }
 
   void print(int ind) {
@@ -156,9 +156,9 @@ class While extends Stmt {
     this.test = test; this.body = body;
   }
 
-  void exec(Memory mem) {
-    while (test.eval(mem).asBool()) {
-      body.exec(mem);
+  void exec(Env env) {
+    while (test.eval(env).asBool()) {
+      body.exec(env);
     }
   }
 
@@ -178,11 +178,11 @@ class If extends Stmt {
     this.test = test; this.t = t; this.f = f;
   }
 
-  void exec(Memory mem) {
-    if (test.eval(mem).asBool()) {
-      t.exec(mem);
+  void exec(Env env) {
+    if (test.eval(env).asBool()) {
+      t.exec(env);
     } else {
-      f.exec(mem);
+      f.exec(env);
     }
   }
 
@@ -202,8 +202,8 @@ class Print extends Stmt {
   private Expr exp;
   Print(Expr exp) { this.exp = exp; }
 
-  void exec(Memory mem) {
-    System.out.println("Output: " + exp.eval(mem).asInt());
+  void exec(Env env) {
+    System.out.println("Output: " + exp.eval(env).asInt());
   }
 
   void print(int ind) {
