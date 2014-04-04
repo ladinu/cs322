@@ -1,77 +1,110 @@
-//____________________________________________________________________________
-// IExpr ::= Var
-//        |  Int
-//        |  IExpr + IExpr
-//        |  IExpr - IExpr
+abstract class Value {
+   abstract String show();
 
-abstract class IExpr {
-  abstract int    eval(Memory mem);
+   boolean asBool() {
+      System.out.println("ABORT: Boolean value expected");
+      System.exit(1);
+      return true; // Not reached
+   }
+
+   int asInt() {
+      System.out.println("ABORT: Integer value expected");
+      System.exit(1);
+      return 0; // Not reached
+   }
+}
+
+class BValue extends Value {
+   private boolean b;
+
+   BValue(boolean b) { this.b = b; }
+   String show() { return Boolean.toString(b); }
+   boolean asBool() { return b; }
+}
+
+class IValue extends Value {
+   private int i;
+
+   IValue(int i) { this.i = i; }
+   String show() { return Integer.toString(i); }
+   int asInt() { return i; }
+}
+
+//____________________________________________________________________________
+// Expr ::= Var
+//        |  Int
+//        |  Expr + Expr
+//        |  Expr - Expr
+//        |  Expr < Expr
+//        |  Expr == Expr
+
+abstract class Expr {
+  abstract Value eval(Memory mem);
   abstract String show();
 }
 
-class Var extends IExpr {
+class Var extends Expr {
   private String name;
   Var(String name) { this.name = name; }
 
-  int    eval(Memory mem) { return mem.load(name); }
+  Value eval(Memory mem) { return mem.load(name); }
   String show() { return name; }
 }
 
-class Int extends IExpr {
+class Int extends Expr {
   private int num;
   Int(int num) { this.num = num; }
 
-  int   eval(Memory mem) { return num; }
+  Value eval(Memory mem) { return new IValue(num); }
   String show() { return Integer.toString(num); }
 }
 
-class Plus extends IExpr {
-  private IExpr l, r;
-  Plus(IExpr l, IExpr r) { this.l = l; this.r = r; }
+class Mult extends Expr {
+  private Expr l, r;
+  Mult(Expr l, Expr r) { this.l = l; this.r = r; }
 
-  int    eval(Memory mem) { return l.eval(mem) + r.eval(mem); }
+  Value eval(Memory mem) { return new IValue(l.eval(mem).asInt() * r.eval(mem).asInt()); }
+  String show() { return "(" + l.show() + " * " + r.show() + ")"; }
+}
+
+class Plus extends Expr {
+  private Expr l, r;
+  Plus(Expr l, Expr r) { this.l = l; this.r = r; }
+
+  Value eval(Memory mem) { return new IValue(l.eval(mem).asInt() + r.eval(mem).asInt()); }
   String show() { return "(" + l.show() + " + " + r.show() + ")"; }
 }
 
-class Minus extends IExpr {
-  private IExpr l, r;
-  Minus(IExpr l, IExpr r) { this.l = l; this.r = r; }
+class Minus extends Expr {
+  private Expr l, r;
+  Minus(Expr l, Expr r) { this.l = l; this.r = r; }
 
-  int    eval(Memory mem) { return l.eval(mem) - r.eval(mem); }
+  Value eval(Memory mem) { return new IValue(l.eval(mem).asInt()- r.eval(mem).asInt()); }
   String show() { return "(" + l.show() + " - " + r.show() + ")"; }
 }
 
-//____________________________________________________________________________
-// BExpr ::= IExpr < IExpr
-//        |  IExpr == IExpr
+class LT extends Expr {
+  private Expr l, r;
+  LT(Expr l, Expr r) { this.l = l; this.r = r; }
 
-abstract class BExpr {
-  abstract boolean eval(Memory mem);
-  abstract String  show();
-}
-
-class LT extends BExpr {
-  private IExpr l, r;
-  LT(IExpr l, IExpr r) { this.l = l; this.r = r; }
-
-  boolean eval(Memory mem) { return l.eval(mem) < r.eval(mem); }
+  Value eval(Memory mem) { return new BValue(l.eval(mem).asInt() < r.eval(mem).asInt()); }
   String show()  { return "(" + l.show() + " < " + r.show() + ")"; }
 }
 
-class EqEq extends BExpr {
-  private IExpr l, r;
-  EqEq(IExpr l, IExpr r) { this.l = l; this.r = r; }
+class EqEq extends Expr {
+  private Expr l, r;
+  EqEq(Expr l, Expr r) { this.l = l; this.r = r; }
 
-  boolean eval(Memory mem) { return l.eval(mem) == r.eval(mem); }
+  Value eval(Memory mem) { return new BValue(l.eval(mem).asInt() == r.eval(mem).asInt()); }
   String show()  { return "(" + l.show() + " == " + r.show() + ")"; }
 }
 
 //____________________________________________________________________________
 // Stmt  ::= Seq Stmt Stmt
-//        |  Var := IExpr
-//        |  While BExpr Stmt
-//        |  If BExpr Stmt Stmt
-//        |  Print IExpr
+//        |  Var := Expr
+//        |  While Expr Stmt
+//        |  If Expr Stmt Stmt
+//        |  Print Expr
 
 abstract class Stmt {
   abstract void exec(Memory mem);
@@ -101,8 +134,8 @@ class Seq extends Stmt {
 
 class Assign extends Stmt {
   private String lhs;
-  private IExpr  rhs;
-  Assign(String lhs, IExpr rhs) {
+  private Expr  rhs;
+  Assign(String lhs, Expr rhs) {
     this.lhs = lhs; this.rhs = rhs;
   }
 
@@ -117,14 +150,14 @@ class Assign extends Stmt {
 }
 
 class While extends Stmt {
-  private BExpr test;
+  private Expr test;
   private Stmt  body;
-  While(BExpr test, Stmt body) {
+  While(Expr test, Stmt body) {
     this.test = test; this.body = body;
   }
 
   void exec(Memory mem) {
-    while (test.eval(mem)) {
+    while (test.eval(mem).asBool()) {
       body.exec(mem);
     }
   }
@@ -139,14 +172,14 @@ class While extends Stmt {
 }
 
 class If extends Stmt {
-  private BExpr test;
+  private Expr test;
   private Stmt  t, f;
-  If(BExpr test, Stmt t, Stmt f) {
+  If(Expr test, Stmt t, Stmt f) {
     this.test = test; this.t = t; this.f = f;
   }
 
   void exec(Memory mem) {
-    if (test.eval(mem)) {
+    if (test.eval(mem).asBool()) {
       t.exec(mem);
     } else {
       f.exec(mem);
@@ -166,11 +199,11 @@ class If extends Stmt {
 }
 
 class Print extends Stmt {
-  private IExpr exp;
-  Print(IExpr exp) { this.exp = exp; }
+  private Expr exp;
+  Print(Expr exp) { this.exp = exp; }
 
   void exec(Memory mem) {
-    System.out.println("Output: " + exp.eval(mem));
+    System.out.println("Output: " + exp.eval(mem).asInt());
   }
 
   void print(int ind) {
