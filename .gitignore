@@ -13,3 +13,6 @@ hs_err_pid*
 
 # Ignore slides
 slides/
+
+# Ignore lab zip files
+zip/
