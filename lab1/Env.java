@@ -3,11 +3,12 @@ class Env {
    private Value val;
    private Env rest;
 
-   Env(String var, Value val, Env, rest) {
+   Env(String var, Value val, Env rest) {
       this.var = var; this.val = val; this.rest = rest;
    }
 
    Value getValue() { return val; }
+
    void setValue(Value val) { this.val = val; }
 
    static Env lookup(Env env, String name) {
