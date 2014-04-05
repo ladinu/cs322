@@ -40,6 +40,7 @@ class IValue extends Value {
 
 abstract class Expr {
   abstract Value eval(Env env);
+  Env evalRef(Env env) { return new ValEnv("", eval(env), null); }
   abstract String show();
 }
 
@@ -48,6 +49,7 @@ class Var extends Expr {
   Var(String name) { this.name = name; }
 
   Value eval(Env env) { return Env.lookup(env, name).getValue(); }
+  Env evalRef(Env env) { return Env.lookup(env, name); }
   String show() { return name; }
 }
 
@@ -140,7 +142,7 @@ class VarDecl extends Stmt {
    }
 
    Env exec(Program prog, Env env) {
-      return new Env(var, expr.eval(env), env);
+      return new ValEnv(var, expr.eval(env), env);
    }
 
    void print(int ind) {
@@ -258,6 +260,7 @@ class Call extends Stmt {
    }
 }
 
+
 class Program {
    private Proc[] procs;
    private Stmt body;
@@ -300,12 +303,40 @@ class Program {
    }
 }
 
+class Formal {
+   protected String name;
+
+   Formal(String name) {
+      this.name = name;
+   }
+
+   Env extend(Env env, Expr expr, Env newenv) {
+      return new ValEnv(name, expr.eval(env), newenv);
+   }
+
+   public String toString() {
+      return name;
+   }
+}
+
+class ByRef extends Formal {
+   ByRef(String name) { super(name); }
+
+   public String toString() {
+      return "ref " + name;
+   }
+
+   Env extend(Env env, Expr expr, Env newenv) {
+      return new RefEnv(name, expr.evalRef(env), newenv);
+   }
+}
+
 class Proc {
    private String name;
-   private String[] formals;
+   private Formal[] formals;
    private Stmt body;
 
-   Proc(String name, String[] formals, Stmt body) {
+   Proc(String name, Formal[] formals, Stmt body) {
       this.name = name; this.formals = formals; this.body = body;
    }
 
@@ -318,7 +349,7 @@ class Proc {
       }
       Env newenv = null;
       for (int i = 0; i < actuals.length; i++) {
-         newenv = new Env(formals[i], actuals[i].eval(env), newenv);
+         newenv = formals[i].extend(env, actuals[i], newenv);
       }
       body.exec(prog, newenv);
    }
