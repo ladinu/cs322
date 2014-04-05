@@ -15,11 +15,12 @@ class MainDT {
        new Seq(new If(new Var("i"), setInt, printI),
                printI));
 
+    Program prog = new Program(s);
     System.out.println("Complete program is:");
-    s.print(4);
+    prog.print();
 
-    System.out.println("Running on an empty memory:");
-    s.exec(null);
+    System.out.println("Running on an empty environment:");
+    prog.run();
 
     System.out.println("Done!");
   }

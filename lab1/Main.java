@@ -8,11 +8,12 @@ class Main {
                                  new Assign("i", new Plus(new Var("i"), new Int(1))))),
                new Print(new Var("t")))));
 
+    Program prog = new Program(s);
     System.out.println("Complete program is:");
-    s.print(4);
+    prog.print();
 
-    System.out.println("Running on an empty memory:");
-    s.exec(null);
+    System.out.println("Running on an empty environment:");
+    prog.run();
     System.out.println("Done!");
   }
 }
