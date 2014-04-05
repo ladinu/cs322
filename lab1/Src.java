@@ -12,6 +12,12 @@ abstract class Value {
       System.exit(1);
       return 0; // Not reached
    }
+
+   Value enter(Value val) {
+      System.out.println("ABORT: First-class function expected");
+      System.exit(1);
+      return null; // Not reached
+   }
 }
 
 class BValue extends Value {
@@ -28,6 +34,24 @@ class IValue extends Value {
    IValue(int i) { this.i = i; }
    String show() { return Integer.toString(i); }
    int asInt() { return i; }
+}
+
+class FValue extends Value {
+   private Env env;
+   private String arg;
+   private Expr body;
+
+   FValue(Env env, String arg, Expr body) {
+      this.env = env; this.arg = arg; this.body = body;
+   }
+
+   Value enter(Value val) {
+      return body.eval(new ValEnv(arg, val, env));
+   }
+
+   String show() {
+      return "<function>";
+   }
 }
 
 //____________________________________________________________________________
@@ -101,6 +125,31 @@ class EqEq extends Expr {
   String show()  { return "(" + l.show() + " == " + r.show() + ")"; }
 }
 
+
+class Lambda extends Expr {
+   private String var;
+   private Expr body;
+
+   Lambda(String var, Expr body) { this.body = body; this.var = var; }
+
+   Value eval(Env env) {
+      return new FValue(env, var, body);
+   }
+
+   String show() { return "(\\" + var + " -> " + body.show() + ")"; }
+}
+
+class Apply extends Expr {
+   private Expr fun, arg;
+
+   Apply(Expr fun, Expr arg) { this.fun = fun; this.arg = arg; }
+
+   Value eval(Env env) {
+      return fun.eval(env).enter(arg.eval(env));
+   }
+
+   String show() { return "(" + fun.show() + " @ " + arg.show() + ")";}
+}
 //____________________________________________________________________________
 // Stmt  ::= Seq Stmt Stmt
 //        |  Var := Expr
