@@ -16,3 +16,9 @@ slides/
 
 # Ignore lab zip files
 zip/
+
+hw1/target/
+hw1/.idea/
+hw1/hw1.iml
+
+.DS_Store

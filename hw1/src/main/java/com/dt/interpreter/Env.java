@@ -1,3 +1,5 @@
+package com.dt.interpreter;
+
 abstract class Env {
    private String var;
    private Env rest;
