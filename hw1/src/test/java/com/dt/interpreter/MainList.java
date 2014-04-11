@@ -5,44 +5,31 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 public class MainList extends TestCase {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public MainList( String testName )
-    {
-        super( testName );
+    public MainList(String testName) {
+        super(testName);
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( MainList.class );
+    public static Test suite() {
+        return new TestSuite(MainList.class);
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    public void testEmptyList() {
+        assertEquals(new EmptyList().show(), "[]");
     }
-//   public static void main(String[] args) {
-//      LValue l0 = new EmptyList();
-//      LValue l1 = new NonEmptyList(new IValue(42), l0);
-//      LValue l2 = new NonEmptyList(new BValue(true), l1);
-//      LValue l3 = new NonEmptyList(new FValue(null, "x", new Var("x")), l2);
-//      LValue l4 = l0;
-//      for (int i=10; i>0; i--) {
-//        l4 = new NonEmptyList(new IValue(i), l4);
-//      }
-//      System.out.println(l0.show());
-//      System.out.println(l1.show());
-//      System.out.println(l2.show());
-//      System.out.println(l3.show());
-//      System.out.println(l4.show());
-//   }
+
+    public void testNonEmptyList() {
+        LValue l0 = new EmptyList();
+        LValue l1 = new NonEmptyList(new IValue(42), l0);
+        LValue l2 = new NonEmptyList(new BValue(true), l1);
+        LValue l3 = new NonEmptyList(new FValue(null, "x", new Var("x")), l2);
+        LValue l4 = l0;
+        for (int i = 10; i > 0; i--) {
+            l4 = new NonEmptyList(new IValue(i), l4);
+        }
+
+        assertEquals("[42]", l1.show());
+        assertEquals("[true, 42]", l2.show());
+        assertEquals("[<function>, true, 42]", l3.show());
+        assertEquals("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]", l4.show());
+    }
 }
