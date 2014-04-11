@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 abstract class Value {
    abstract String show();
 
@@ -54,6 +57,42 @@ class FValue extends Value {
    }
 }
 
+abstract class LValue extends Value {
+}
+
+class EmptyList extends LValue {
+   String show() { return "[]"; }
+}
+
+class NonEmptyList extends LValue {
+   private Value  head;
+   private LValue tail;
+
+   NonEmptyList(Value head, LValue tail) {
+     this.head = head; this.tail=tail;
+   }
+   
+   String show() {
+      ArrayList<Value> elements = new ArrayList<Value>();
+      elements.add(head);
+      LValue next = tail;
+      while ( next instanceof NonEmptyList ) {
+         elements.add(((NonEmptyList)next).head);
+         next = ((NonEmptyList)next).tail;
+      }
+      String str = "[";
+      int index = 0;
+      for (Value val: elements ) {
+         if (index == elements.size() - 1) {
+            str += val.show() + "]";
+         } else {
+            str += val.show() + ", ";
+         }
+         index += 1;
+      }
+      return str;
+   }
+}
 //____________________________________________________________________________
 // Expr ::= Var
 //        |  Int
@@ -149,6 +188,34 @@ class Apply extends Expr {
    }
 
    String show() { return "(" + fun.show() + " @ " + arg.show() + ")";}
+}
+
+class Nil extends Expr {
+   Value eval(Env env) { return new EmptyList(); }
+   String show() { return "[]"; }
+}
+
+class Cons extends Expr {
+   private Expr head;
+   private Expr tail;
+
+   Cons(Expr head, Expr tail) {
+      this.head = head; this.tail = tail;
+   }
+   
+   Value eval(Env env) {
+      if ( !(tail.eval(env) instanceof LValue) ) {
+         System.out.println("ABORT: list value expected");
+         System.exit(1);
+      }
+      LValue rHead = (LValue)head.eval(env);
+      LValue rTail = (LValue)tail.eval(env);
+      return new NonEmptyList(rHead, rTail);
+   }
+
+   String show() { 
+      return "cons(" + head.show() + ", " + tail.show() +")";
+   }
 }
 //____________________________________________________________________________
 // Stmt  ::= Seq Stmt Stmt
@@ -273,7 +340,7 @@ class Print extends Stmt {
   Print(Expr exp) { this.exp = exp; }
 
   Env exec(Program prog, Env env) {
-    System.out.println("Output: " + exp.eval(env).asInt());
+    System.out.println("Output: " + exp.eval(env).show());
     return env;
   }
 
