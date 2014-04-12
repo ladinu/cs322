@@ -1,6 +1,6 @@
 package com.dt.interpreter;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class NonEmptyListTest {
@@ -20,4 +20,16 @@ public class NonEmptyListTest {
         Assert.assertEquals("[<function>, true, 42]", l3.show());
         Assert.assertEquals("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]", l4.show());
     }
+
+   @Test
+   public void testGetHead() throws Exception {
+      NonEmptyList list = new NonEmptyList(new IValue(1), new EmptyList());
+      Assert.assertEquals("1", list.getHead().show());
+   }
+
+   @Test
+   public void testGetTail() throws Exception {
+      NonEmptyList list = new NonEmptyList(new IValue(1), new EmptyList());
+      Assert.assertEquals("[]", list.getTail().show());
+   }
 }

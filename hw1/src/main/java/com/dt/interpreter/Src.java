@@ -92,6 +92,14 @@ class NonEmptyList extends LValue {
       }
       return str;
    }
+
+   Value getHead() {
+      return head;
+   }
+
+   Value getTail() {
+      return tail;
+   }
 }
 //____________________________________________________________________________
 // Expr ::= Var
@@ -202,19 +210,96 @@ class Cons extends Expr {
    Cons(Expr head, Expr tail) {
       this.head = head; this.tail = tail;
    }
-   
+
    Value eval(Env env) {
-      if ( !(tail.eval(env) instanceof LValue) ) {
+      checkIfLValue(env, tail);
+      LValue tailEnd = (LValue)tail.eval(env);
+      return new NonEmptyList(head.eval(env), tailEnd);
+   }
+
+   String show() {
+      return "cons (" + head.show() + ", " + tail.show() +")";
+   }
+
+   void checkIfLValue(Env env, Expr expr) {
+      if ( !(expr.eval(env) instanceof LValue) ) {
          System.out.println("ABORT: list value expected");
          System.exit(1);
       }
-      LValue rHead = (LValue)head.eval(env);
-      LValue rTail = (LValue)tail.eval(env);
-      return new NonEmptyList(rHead, rTail);
+   }
+}
+
+class NonEmpty extends Expr {
+   private Expr e;
+   NonEmpty(Expr e) { this.e = e;}
+
+   Value eval(Env env) {
+      if (!isLValue(env, e)) {
+         System.out.println("ABORT: list value expected");
+         System.exit(1);
+      }
+
+      if (e.eval(env) instanceof NonEmptyList ) {
+         return new BValue(true);
+      } else {
+         return new BValue(false);
+      }
    }
 
-   String show() { 
-      return "cons(" + head.show() + ", " + tail.show() +")";
+   String show() {
+      return "nonEmpty (" + e.show() + ")";
+   }
+
+   static boolean isLValue(Env env, Expr e) {
+      return e.eval(env) instanceof LValue;
+   }
+}
+
+class Head extends Expr {
+   private Expr e;
+   Head(Expr e) {this.e = e;}
+
+   Value eval(Env env) {
+      if (e.eval(env) instanceof NonEmptyList) {
+         NonEmptyList list = (NonEmptyList)e.eval(env);
+         return list.getHead();
+      } else if (e.eval(env) instanceof EmptyList) {
+         System.out.println("ABORT: nonempty list value expected");
+         System.exit(1);
+         return new BValue(false); // Not reached
+      } else {
+         System.out.println("ABORT: list value expected");
+         System.exit(1);
+         return new BValue(false); // Not reached
+      }
+   }
+
+   String show() {
+      return "head (" + e.show() + ")";
+   }
+}
+
+class Tail extends Expr {
+   private Expr e;
+   Tail(Expr e) { this.e = e;}
+
+   Value eval(Env env) {
+      if (e.eval(env) instanceof NonEmptyList) {
+         NonEmptyList list = (NonEmptyList)e.eval(env);
+         return list.getTail();
+      } else if (e.eval(env) instanceof EmptyList) {
+         System.out.println("ABORT: nonempty list value expected");
+         System.exit(1);
+         return new BValue(false); // Not reached
+      } else {
+         System.out.println("ABORT: list value expected");
+         System.exit(1);
+         return new BValue(false); // Not reached
+      }
+   }
+
+   String show() {
+      return "tail (" + e.show() + ")";
    }
 }
 //____________________________________________________________________________
@@ -487,3 +572,4 @@ class Proc {
       System.out.println("}");
    }
 }
+
