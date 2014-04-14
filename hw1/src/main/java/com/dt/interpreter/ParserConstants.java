@@ -11,15 +11,15 @@ public interface ParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int INTLIT = 29;
+  int INTLIT = 40;
   /** RegularExpression Id. */
-  int POSDIGIT = 30;
+  int POSDIGIT = 41;
   /** RegularExpression Id. */
-  int ZERO = 31;
+  int ZERO = 42;
   /** RegularExpression Id. */
-  int DIGIT = 32;
+  int DIGIT = 43;
   /** RegularExpression Id. */
-  int IDENT = 33;
+  int IDENT = 44;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -41,20 +41,31 @@ public interface ParserConstants {
     "\"while\"",
     "\"print\"",
     "\"var\"",
-    "\"\\\\\"",
+    "\"for\"",
+    "\"in\"",
+    "\"case\"",
+    "\"of\"",
+    "\"[\"",
+    "\"]\"",
     "\"->\"",
+    "\"cons\"",
+    "\"end\"",
+    "\"\\\\\"",
     "\"<\"",
     "\"==\"",
     "\"+\"",
     "\"-\"",
     "\"*\"",
     "\"@\"",
+    "\"nonEmpty\"",
+    "\"head\"",
+    "\"tail\"",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
-    "<token of kind 27>",
-    "<token of kind 28>",
+    "<token of kind 38>",
+    "<token of kind 39>",
     "<INTLIT>",
     "<POSDIGIT>",
     "\"0\"",

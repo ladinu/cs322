@@ -73,13 +73,7 @@ class NonEmptyList extends LValue {
    }
    
    String show() {
-      ArrayList<Value> elements = new ArrayList<Value>();
-      elements.add(head);
-      LValue next = tail;
-      while ( next instanceof NonEmptyList ) {
-         elements.add(((NonEmptyList)next).head);
-         next = ((NonEmptyList)next).tail;
-      }
+      ArrayList<Value> elements = getArrayList();
       String str = "[";
       int index = 0;
       for (Value val: elements ) {
@@ -99,6 +93,17 @@ class NonEmptyList extends LValue {
 
    Value getTail() {
       return tail;
+   }
+
+   ArrayList<Value> getArrayList() {
+      ArrayList<Value> elements = new ArrayList<Value>();
+      elements.add(head);
+      LValue next = tail;
+      while ( next instanceof NonEmptyList ) {
+         elements.add(((NonEmptyList)next).head);
+         next = ((NonEmptyList)next).tail;
+      }
+      return elements;
    }
 }
 
@@ -490,6 +495,42 @@ class Case extends Stmt {
       indent(ind+2);
       System.out.println("cons(" + h + ", " + t + ") ->");
       ifNonEmpty.print(ind+4);
+   }
+}
+
+class For extends Stmt {
+   private String v;
+   private Expr list;
+   private Stmt body;
+   For(String v, Expr list, Stmt body) {
+      this.v = v; this.list = list; this.body = body;
+   }
+
+   Env exec(Program prog, Env env) {
+      Value evaledList = list.eval(env);
+      if (evaledList instanceof NonEmptyList) {
+         NonEmptyList l = (NonEmptyList)evaledList;
+         env = new ValEnv(v, new EmptyList(), env);
+         for(Value val : l.getArrayList()) {
+            env.setValue(val);
+            env = body.exec(prog, env);
+         }
+         return env;
+      } else if (evaledList instanceof EmptyList) {
+         return env;
+      } else {
+         System.out.println("ABORT: list value expected");
+         System.exit(1);
+         return env; // Not reached
+      }
+   }
+
+   void print(int ind) {
+      indent(ind);
+      System.out.println("for (" + v + " in " + list.show() + ") {");
+      body.print(ind+2);
+      indent(ind);
+      System.out.println("}");
    }
 }
 

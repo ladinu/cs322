@@ -119,13 +119,13 @@ Stmt stmt() : { Token h, t; Expr e; Stmt s1, s2; Expr[] a; } {
    { return new Print(e); }
 | "var" t=<IDENT> "=" e=expr() ";"
    { return new VarDecl(t.image, e); }
-// | "for" "(" t=<IDENT> "in" e=expr() ")" s1=stmt()
-//    { return new For(t.image, e, s1); }
-// | "case" e=expr() "of"
-//      "[" "]" "->" s1=stmts()
-//      "cons" "(" h=<IDENT> "," t=<IDENT> ")" "->" s2=stmts()
-//   "end"
-//    { return new Case(e, s1, h.image, t.image, s2); }
+| "for" "(" t=<IDENT> "in" e=expr() ")" s1=stmt()
+   { return new For(t.image, e, s1); }
+| "case" e=expr() "of"
+     "[" "]" "->" s1=stmts()
+     "cons" "(" h=<IDENT> "," t=<IDENT> ")" "->" s2=stmts()
+  "end"
+   { return new Case(e, s1, h.image, t.image, s2); }
 }
 
 Stmt stmts() : { Stmt s1, s2; } { // one or more statements:
@@ -181,16 +181,16 @@ Expr atom() : { Expr e; Token t; } {
   "(" e=expr() ")" { return e; }
 | t=<INTLIT>       { return new Int(Integer.parseInt(t.image)); }
 | t=<IDENT>        { return new Var(t.image); }
-// | "[" "]"          { return new Nil(); }
-// | e=call()         { return e; }
+| "[" "]"          { return new Nil(); }
+| e=call()         { return e; }
 }
 
-// Expr call() : { Expr m, n; } {
-//   "cons"     "(" m=expr() "," n=expr() ")" { return new Cons(m, n); }
-// | "nonEmpty" "(" m=expr()              ")" { return new NonEmpty(m); }
-// | "head"     "(" m=expr()              ")" { return new Head(m); }
-// | "tail"     "(" m=expr()              ")" { return new Tail(m); }
-// }
+Expr call() : { Expr m, n; } {
+  "cons"     "(" m=expr() "," n=expr() ")" { return new Cons(m, n); }
+| "nonEmpty" "(" m=expr()              ")" { return new NonEmpty(m); }
+| "head"     "(" m=expr()              ")" { return new Head(m); }
+| "tail"     "(" m=expr()              ")" { return new Tail(m); }
+}
 
 //-- Define the lexical structure of an input language: ----------------------
 

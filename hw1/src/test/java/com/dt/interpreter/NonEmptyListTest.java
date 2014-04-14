@@ -3,6 +3,8 @@ package com.dt.interpreter;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 public class NonEmptyListTest {
     @Test
     public void testShow() throws Exception {
@@ -31,5 +33,20 @@ public class NonEmptyListTest {
    public void testGetTail() throws Exception {
       NonEmptyList list = new NonEmptyList(new IValue(1), new EmptyList());
       Assert.assertEquals("[]", list.getTail().show());
+   }
+
+   @Test
+   public void testGetArrayList() throws Exception {
+      Value ival = new IValue(1);
+      Value bval = new BValue(true);
+      NonEmptyList list = new NonEmptyList(ival, new EmptyList());
+      list = new NonEmptyList(bval, list);
+
+      ArrayList<Value> expected = new ArrayList<Value>();
+      expected.add(bval);
+      expected.add(ival);
+
+      ArrayList<Value> actual = list.getArrayList();
+      Assert.assertTrue(expected.equals(list.getArrayList()));
    }
 }
