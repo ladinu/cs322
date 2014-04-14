@@ -1,23 +1,43 @@
 package com.dt.interpreter;
 import java.util.ArrayList;
 
+enum Errors {
+   LIST_VALUE_EXPECTED("ABORT: list value expected"),
+   NON_EMPTY_LIST_EXPECTED("ABORT: nonempty list expected"),
+   BOOLEAN_VALUE_EXPECTED("ABORT: Boolean value expected"),
+   INTEGER_VALUE_EXPECTED("ABORT: Integer value expected"),
+   FIRST_CLASS_FUNCTION_EXPECTED("ABORT: First-class function expected"),
+   CANNOT_FIND_FUNCTION("ABORT: Cannot find function "),
+   WRONG_NUMBER_OF_ARGUMENTS("ABORT: Wrong number of arguments for ");
+
+
+   private final String error;
+   private Errors(String error) {
+      this.error = error;
+   }
+   @Override
+   public String toString() {
+      return this.error;
+   }
+}
+
 abstract class Value {
    abstract String show();
 
    boolean asBool() {
-      System.out.println("ABORT: Boolean value expected");
+      System.out.println(Errors.BOOLEAN_VALUE_EXPECTED.toString());
       System.exit(1);
       return true; // Not reached
    }
 
    int asInt() {
-      System.out.println("ABORT: Integer value expected");
+      System.out.println(Errors.INTEGER_VALUE_EXPECTED.toString());
       System.exit(1);
       return 0; // Not reached
    }
 
    Value enter(Value val) {
-      System.out.println("ABORT: First-class function expected");
+      System.out.println(Errors.FIRST_CLASS_FUNCTION_EXPECTED.toString());
       System.exit(1);
       return null; // Not reached
    }
@@ -221,7 +241,7 @@ class Cons extends Expr {
 
    void checkIfLValue(Env env, Expr expr) {
       if ( !(expr.eval(env) instanceof LValue) ) {
-         System.out.println("ABORT: list value expected");
+         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
          System.exit(1);
       }
    }
@@ -233,7 +253,7 @@ class NonEmpty extends Expr {
 
    Value eval(Env env) {
       if (!isLValue(env, e)) {
-         System.out.println("ABORT: list value expected");
+         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
          System.exit(1);
       }
 
@@ -262,11 +282,11 @@ class Head extends Expr {
          NonEmptyList list = (NonEmptyList)e.eval(env);
          return list.getHead();
       } else if (e.eval(env) instanceof EmptyList) {
-         System.out.println("ABORT: nonempty list value expected");
+         System.out.println(Errors.NON_EMPTY_LIST_EXPECTED.toString());
          System.exit(1);
          return new BValue(false); // Not reached
       } else {
-         System.out.println("ABORT: list value expected");
+         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
          System.exit(1);
          return new BValue(false); // Not reached
       }
@@ -286,11 +306,11 @@ class Tail extends Expr {
          NonEmptyList list = (NonEmptyList)e.eval(env);
          return list.getTail();
       } else if (e.eval(env) instanceof EmptyList) {
-         System.out.println("ABORT: nonempty list value expected");
+         System.out.println(Errors.NON_EMPTY_LIST_EXPECTED.toString());
          System.exit(1);
          return new BValue(false); // Not reached
       } else {
-         System.out.println("ABORT: list value expected");
+         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
          System.exit(1);
          return new BValue(false); // Not reached
       }
@@ -480,7 +500,7 @@ class Case extends Stmt {
          env = new ValEnv(h, head, new ValEnv(t, tail, env));
          return ifNonEmpty.exec(prog, env);
       } else {
-         System.out.println("ABORT: list value expected");
+         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
          System.exit(1);
          return env;
       }
@@ -495,6 +515,7 @@ class Case extends Stmt {
       indent(ind+2);
       System.out.println("cons(" + h + ", " + t + ") ->");
       ifNonEmpty.print(ind+4);
+      System.out.println("end");
    }
 }
 
@@ -519,7 +540,7 @@ class For extends Stmt {
       } else if (evaledList instanceof EmptyList) {
          return env;
       } else {
-         System.out.println("ABORT: list value expected");
+         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
          System.exit(1);
          return env; // Not reached
       }
@@ -556,12 +577,12 @@ class Program {
             return;
          }
       }
-      System.out.println("ABORT: Cannot find function " + name);
+      System.out.println(Errors.CANNOT_FIND_FUNCTION.toString() + name);
       System.exit(1);
    }
 
    void print() {
-      int indent = 4;
+      int indent = 0;
       printProcs(indent);
       body.print(indent);
       System.out.println();
@@ -617,7 +638,7 @@ class Proc {
 
    void call(Program prog, Env env, Expr[] actuals) {
       if (actuals.length != formals.length) {
-         System.out.println("ABORT: Wrong number of arguments for " + name);
+         System.out.println(Errors.WRONG_NUMBER_OF_ARGUMENTS.toString() + name);
          System.exit(1);
       }
       Env newenv = null;

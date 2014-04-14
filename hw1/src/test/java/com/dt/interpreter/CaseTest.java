@@ -5,47 +5,52 @@ import org.junit.Assert;
 import org.junit.contrib.java.lang.system.Assertion;
 
 public class CaseTest extends BaseTest {
-
-   Stmt ifEmpty = new Print(new Int(1));
-   Stmt ifNonEmpty = new Print(new Int(0));
-   Program p = new Program(new Print(new Int(1)));
-
    @Test
    public void testExecIfEmpty() throws Exception {
-      Case c = new Case(new Nil(), ifEmpty, "", "", ifNonEmpty);
-      c.exec(p, getEmptyEnv());
-      Assert.assertEquals("Output: 1\n", log.getLog());
+      String snippet = "" +
+            "case [] of" +
+            "  [] ->" +
+            "    print 1;" +
+            "  cons(h, t) ->" +
+            "    print 0;" +
+            "end";
+      Assert.assertEquals(output("1"), input(snippet));
    }
 
    @Test
    public void testExecIfNonEmpty() throws Exception {
-      Cons cons = new Cons(new Int(1), new Nil());
-      Case c = new Case(cons, ifEmpty, "", "", ifNonEmpty);
-
-      c.exec(p, getEmptyEnv());
-      Assert.assertEquals("Output: 0\n", log.getLog());
+      String snippet = "" +
+            "case cons(1, []) of" +
+            "  [] ->" +
+            "    print 1;" +
+            "  cons(h, t) ->" +
+            "    print 0;" +
+            "end";
+      Assert.assertEquals(output("0"), input(snippet));
    }
 
    @Test
    public void testExecOtherExpr() throws Exception {
-      Case c = new Case(new Int(1), ifEmpty, "", "", ifNonEmpty);
-      exit.expectSystemExitWithStatus(1);
-      exit.checkAssertionAfterwards(new Assertion() {
-         @Override
-         public void checkAssertion() throws Exception {
-            Assert.assertEquals("ABORT: list value expected\n", log.getLog());
-         }
-      });
-      c.exec(p, getEmptyEnv());
+      String snippet = "" +
+            "case (1+1) of" +
+            "  [] ->" +
+            "    print 1;" +
+            "  cons(h, t) ->" +
+            "    print 0;" +
+            "end";
+      expectExit(1, Errors.LIST_VALUE_EXPECTED, snippet);
    }
 
    @Test
    public void testPrint() throws Exception {
-      Case c = new Case(new Nil(), ifEmpty, "h", "t", ifNonEmpty);
-      String expected = "case [] of\n  [] ->\n    " +
-            "print 1;\n  cons(h, t) ->\n    print 0;\n";
-      c.print(0);
-      Assert.assertEquals(expected, log.getLog());
-
+      String snippet = "" +
+            "case [] of\n" +
+            "  [] ->\n" +
+            "    print 1;\n" +
+            "  cons(h, t) ->\n" +
+            "    print 0;\n" +
+            "end\n" +
+            "\n";
+      Assert.assertEquals(snippet, printedfAfterParsing(snippet));
    }
 }

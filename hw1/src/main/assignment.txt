@@ -575,4 +575,8 @@ some more hints and discussion.  For those who are interested,
 however, we do expect to come back to this topic later in the
 term.)
 
+TODO:
+-- Before turning in, remove "package" statement from Src.java
+-- Make indent of print() in Program to 4 instead of 0
+-- Remove "end" keyword from show() method of Case
 ------------------------------------------------------------------------
