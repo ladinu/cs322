@@ -101,13 +101,6 @@ class NonEmptyList extends LValue {
       return tail;
    }
 }
-//____________________________________________________________________________
-// Expr ::= Var
-//        |  Int
-//        |  Expr + Expr
-//        |  Expr - Expr
-//        |  Expr < Expr
-//        |  Expr == Expr
 
 abstract class Expr {
   abstract Value eval(Env env);
@@ -302,12 +295,6 @@ class Tail extends Expr {
       return "tail (" + e.show() + ")";
    }
 }
-//____________________________________________________________________________
-// Stmt  ::= Seq Stmt Stmt
-//        |  Var := Expr
-//        |  While Expr Stmt
-//        |  If Expr Stmt Stmt
-//        |  Print Expr
 
 abstract class Stmt {
   abstract Env exec(Program prog, Env env);
@@ -351,6 +338,7 @@ class VarDecl extends Stmt {
       System.out.println("var " + var + " = " + expr.show() + ";");
    }
 }
+
 class Assign extends Stmt {
   private String lhs;
   private Expr  rhs;
@@ -461,6 +449,49 @@ class Call extends Stmt {
    }
 }
 
+class Case extends Stmt {
+   private Expr   expr;
+   private Stmt   ifEmpty;
+   private String h;
+   private String t;
+   private Stmt   ifNonEmpty;
+   Case(Expr expr, Stmt ifEmpty, String h, String t, Stmt ifNonEmpty) {
+      this.expr       = expr;
+      this.ifEmpty    = ifEmpty;
+      this.h          = h;
+      this.t          = t;
+      this.ifNonEmpty = ifNonEmpty;
+   }
+
+   Env exec(Program prog, Env env) {
+      Value val = expr.eval(env);
+
+      if (val instanceof EmptyList) {
+         return ifEmpty.exec(prog, env);
+      } else if (val instanceof NonEmptyList) {
+         NonEmptyList list = (NonEmptyList)val;
+         Value head = list.getHead();
+         Value tail = list.getTail();
+         env = new ValEnv(h, head, new ValEnv(t, tail, env));
+         return ifNonEmpty.exec(prog, env);
+      } else {
+         System.out.println("ABORT: list value expected");
+         System.exit(1);
+         return env;
+      }
+   }
+
+   void print(int ind) {
+      indent(ind);
+      System.out.println("case " + expr.show() + " of");
+      indent(ind+2);
+      System.out.println("[] ->");
+      ifEmpty.print(ind+4);
+      indent(ind+2);
+      System.out.println("cons(" + h + ", " + t + ") ->");
+      ifNonEmpty.print(ind+4);
+   }
+}
 
 class Program {
    private Proc[] procs;
