@@ -6,28 +6,17 @@ import org.junit.Assert;
 public class NonEmptyTest extends BaseTest {
    @Test
    public void testEvalEmpty() throws Exception {
-      NonEmpty nonEmpty = new NonEmpty(new Nil());
-      Value val = nonEmpty.eval(getEmptyEnv());
-
-      Assert.assertTrue(val instanceof BValue);
-      Assert.assertFalse(val.asBool());
+      Assert.assertEquals(output("false"), run("print nonEmpty([]);"));
    }
 
    @Test
    public void testEvalNonEmpty() throws Exception {
-      Cons nonEmptyList = new Cons(new Int(1), new Nil());
-      NonEmpty nonEmpty = new NonEmpty(nonEmptyList);
-      Value val = nonEmpty.eval(getEmptyEnv());
-
-      Assert.assertTrue(val instanceof BValue);
-      Assert.assertTrue(val.asBool());
+      Assert.assertEquals(output("true"), run("print nonEmpty(cons(1, []));"));
    }
 
    @Test
    public void testEvalNonList() throws Exception {
-      exit.expectSystemExitWithStatus(1);
-      NonEmpty nonEmpty = new NonEmpty(new Int(3));
-      nonEmpty.eval(getEmptyEnv());
+      expectExit(1, Errors.LIST_VALUE_EXPECTED, "print nonEmpty(1+2);");
    }
 
    @Test
@@ -38,7 +27,6 @@ public class NonEmptyTest extends BaseTest {
 
    @Test
    public void testShow() throws Exception {
-      NonEmpty nonEmpty = new NonEmpty(new Nil());
-      Assert.assertEquals("nonEmpty ([])", nonEmpty.show());
+      Assert.assertEquals("print nonEmpty([]);\n\n", showSnippet("print nonEmpty([]);"));
    }
 }

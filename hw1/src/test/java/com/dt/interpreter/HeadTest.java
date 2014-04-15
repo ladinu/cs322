@@ -6,27 +6,21 @@ import org.junit.Assert;
 public class HeadTest extends BaseTest {
    @Test
    public void testEvalNonEmptyList() throws Exception {
-      Head h = new Head(new Cons(new Int(1), new Nil()));
-      Assert.assertEquals(h.eval(getEmptyEnv()).show(), "1");
+      Assert.assertEquals(output("1"), run("print head(cons(1, []));"));
    }
 
    @Test
    public void testEvalEmptyList() throws Exception {
-      Head h = new Head(new Nil());
-      exit.expectSystemExitWithStatus(1);
-      h.eval(getEmptyEnv());
+      expectExit(1, Errors.NON_EMPTY_LIST_EXPECTED, "print head([]);");
    }
 
    @Test
    public void testEvalOtherExpr() throws Exception {
-      Head h = new Head(new Int(4));
-      exit.expectSystemExitWithStatus(1);
-      h.eval(getEmptyEnv());
+      expectExit(1, Errors.LIST_VALUE_EXPECTED, "print head(1);");
    }
 
    @Test
    public void testShow() throws Exception {
-      Head h = new Head(new Nil());
-      Assert.assertEquals("head ([])", h.show());
+      Assert.assertEquals("print head(cons(1, []));\n\n", showSnippet("print head(cons(1, []));"));
    }
 }

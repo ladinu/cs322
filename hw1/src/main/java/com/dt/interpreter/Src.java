@@ -236,7 +236,7 @@ class Cons extends Expr {
    }
 
    String show() {
-      return "cons (" + head.show() + ", " + tail.show() +")";
+      return "cons(" + head.show() + ", " + tail.show() +")";
    }
 
    void checkIfLValue(Env env, Expr expr) {
@@ -265,7 +265,7 @@ class NonEmpty extends Expr {
    }
 
    String show() {
-      return "nonEmpty (" + e.show() + ")";
+      return "nonEmpty(" + e.show() + ")";
    }
 
    static boolean isLValue(Env env, Expr e) {
@@ -293,7 +293,7 @@ class Head extends Expr {
    }
 
    String show() {
-      return "head (" + e.show() + ")";
+      return "head(" + e.show() + ")";
    }
 }
 
@@ -317,7 +317,7 @@ class Tail extends Expr {
    }
 
    String show() {
-      return "tail (" + e.show() + ")";
+      return "tail(" + e.show() + ")";
    }
 }
 

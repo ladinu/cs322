@@ -23,7 +23,7 @@ public abstract class BaseTest {
    }
 
    // Given a DT snippet, run and get the output
-   public String input(String snippet) {
+   public String run(String snippet) {
       log.clear();
       Snippet.run(snippet);
       return log.getLog();
@@ -40,7 +40,7 @@ public abstract class BaseTest {
       Snippet.run(snippet);
    }
 
-   public String printedfAfterParsing(String snippet) {
+   public String showSnippet(String snippet) {
       log.clear();
       Snippet.show(snippet);
       return log.getLog();

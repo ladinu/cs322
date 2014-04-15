@@ -10,14 +10,12 @@ import java.io.StringReader;
 public class NilTest extends BaseTest {
    @Test
    public void testEval() throws Exception {
-      Nil nil = new Nil();
-      Value val = nil.eval(getEmptyEnv());
-      Assert.assertTrue(val instanceof EmptyList);
+      Assert.assertEquals(output("[]"), run("print [];"));
    }
 
    @Test
    public void testShow() throws Exception {
-      Assert.assertEquals("[]", new Nil().show());
+      Assert.assertEquals("print [];\n\n", showSnippet("print [];"));
    }
 
 }

@@ -2,7 +2,6 @@ package com.dt.interpreter;
 
 import org.junit.Test;
 import org.junit.Assert;
-import org.junit.contrib.java.lang.system.Assertion;
 
 public class CaseTest extends BaseTest {
    @Test
@@ -14,7 +13,7 @@ public class CaseTest extends BaseTest {
             "  cons(h, t) ->" +
             "    print 0;" +
             "end";
-      Assert.assertEquals(output("1"), input(snippet));
+      Assert.assertEquals(output("1"), run(snippet));
    }
 
    @Test
@@ -26,7 +25,7 @@ public class CaseTest extends BaseTest {
             "  cons(h, t) ->" +
             "    print 0;" +
             "end";
-      Assert.assertEquals(output("0"), input(snippet));
+      Assert.assertEquals(output("0"), run(snippet));
    }
 
    @Test
@@ -51,6 +50,6 @@ public class CaseTest extends BaseTest {
             "    print 0;\n" +
             "end\n" +
             "\n";
-      Assert.assertEquals(snippet, printedfAfterParsing(snippet));
+      Assert.assertEquals(snippet, showSnippet(snippet));
    }
 }
