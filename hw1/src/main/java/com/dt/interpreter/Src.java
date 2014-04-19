@@ -93,11 +93,10 @@ class NonEmptyList extends LValue {
    }
    
    String show() {
-      ArrayList<Value> elements = getArrayList();
       String str = "[";
       int index = 0;
-      for (Value val: elements ) {
-         if (index == elements.size() - 1) {
+      for (Value val: getArrayList() ) {
+         if (index == getArrayList().size() - 1) {
             str += val.show() + "]";
          } else {
             str += val.show() + ", ";
