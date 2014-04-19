@@ -1,7 +1,10 @@
 package com.dt.interpreter;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.StringReader;
 
 
 public class ReverseTest extends BaseTest{
@@ -32,6 +35,52 @@ public class ReverseTest extends BaseTest{
             "var o = [];" +
             "reverse(l, o);" +
             "print o;";
-      Assert.assertEquals(output("[3, 2, 1]"), run(snippet));
+       Assert.assertEquals(output("[3, 2, 1]"), run(snippet));
+   }
+
+   @Test
+   public void count() {
+      String snippet = "" +
+            "procedure count(val, list, ref num) {" +
+            "  num = 0;" +
+            "  for (i in list) {" +
+            "     if (i == val) {" +
+            "        num = num + 1;" +
+            "     } else { var junk = 0;}" +
+            "  }" +
+            "}" +
+            "" +
+            "var n = 0;" +
+            "count(4, cons(4, cons(4, cons(4, cons(1, cons(2, []))))), n);" +
+            "print n;";
+      Assert.assertEquals(output("3"), run(snippet));
+   }
+
+   @Test
+   public void position() {
+      String snippet = "" +
+            "procedure position(val, list, ref pos) {" +
+            "  pos = 0;" +
+            "  var notFound = (1==1);" +
+            "  var index = 1;" +
+            "  for (i in list) {" +
+            "     if (notFound) {" +
+            "        if (i == val) {" +
+            "           pos = index;" +
+            "           notFound = (1==0);" +
+            "        } else {" +
+            "           index = index + 1;" +
+            "        }" +
+            "     } else {" +
+            "        var junk = 0;" +
+            "     }" +
+            "  }" +
+            "}" +
+            "" +
+            "var pos = 10;" +
+            "position(3, cons(1, cons(3, cons(2, []))), pos);" +
+            "print pos;";
+
+      Assert.assertEquals(output("2"), run(snippet));
    }
 }
