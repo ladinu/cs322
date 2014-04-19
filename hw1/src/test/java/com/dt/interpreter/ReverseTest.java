@@ -8,15 +8,6 @@ import java.io.StringReader;
 
 
 public class ReverseTest extends BaseTest{
-   private String length = "" +
-         "procedure getlength(list, ref l) {" +
-         "  var length = 0;" +
-         "  for (i in list) {" +
-         "     length = length + 1;" +
-         "  }" +
-         "  l = length;" +
-         "}";
-
    //      Parser p = new Parser(new StringReader(snippet));
 //      try {
 //         p.prog().run();
@@ -36,6 +27,25 @@ public class ReverseTest extends BaseTest{
             "reverse(l, o);" +
             "print o;";
        Assert.assertEquals(output("[3, 2, 1]"), run(snippet));
+   }
+
+   @Test
+   public void map() {
+      String snippet = "" +
+            "procedure map(f, list, ref out) {" +
+            "  var tmp = [];" +
+            "  for (i in list) {" +
+            "     tmp = cons(i, tmp);" +
+            "  }" +
+            "  for (i in tmp) {" +
+            "     out = cons((f @ i), out);" +
+            "  }" +
+            "}" +
+            "" +
+            "var out = [];" +
+            "map((\\x -> (x * 2)), cons(1, cons(2, cons(3, []))), out);" +
+            "print out;";
+      Assert.assertEquals(output("[2, 4, 6]"), run(snippet));
    }
 
    @Test
