@@ -22,6 +22,15 @@ public abstract class BaseTest {
       return "Output: " + expectedOutput + "\n";
    }
 
+   public String outputs(String expected) {
+
+      String outStr = "";
+      for (String i: expected.split(" & ")) {
+         outStr += output(i);
+      }
+      return outStr;
+   }
+
    // Given a DT snippet, run and get the output
    public String run(String snippet) {
       log.clear();
