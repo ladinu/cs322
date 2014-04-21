@@ -38,6 +38,7 @@ public abstract class BaseTest {
    }
 
    public void expectExit(Integer exitStatus, final Errors expectedMsg, String snippet) {
+      log.clear();
       exit.expectSystemExitWithStatus(exitStatus);
       exit.checkAssertionAfterwards(new Assertion() {
          @Override
@@ -48,10 +49,26 @@ public abstract class BaseTest {
       Snippet.run(snippet);
    }
 
+
+   public void expectExit(Integer exitStatus, final String expectedMsg, String snippet) {
+      log.clear();
+      exit.expectSystemExitWithStatus(exitStatus);
+      exit.checkAssertionAfterwards(new Assertion() {
+         @Override
+         public void checkAssertion() throws Exception {
+            Assert.assertEquals(expectedMsg+"\n", log.getLog());
+         }
+      });
+      Snippet.run(snippet);
+   }
    public String showSnippet(String snippet) {
       log.clear();
       Snippet.show(snippet);
       return log.getLog();
+   }
+
+   public void println(String str) {
+      System.out.println(str);
    }
 }
 
