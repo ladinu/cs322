@@ -7,25 +7,25 @@ public class SampleTest extends BaseTest {
    @Test
    public void main() {
       String snippet = "" +
-            "    var t = 1;\n" +
-            "    var i = 1;\n" +
-            "    while ((i < 11)) {\n" +
-            "      t = (t * i);\n" +
-            "      i = (i + 1);\n" +
-            "    }\n" +
-            "    print t;\n";
+            "    var t = 1;" +
+            "    var i = 1;" +
+            "    while ((i < 11)) {" +
+            "      t = (t * i);" +
+            "      i = (i + 1);" +
+            "    }" +
+            "    print t;";
       Assert.assertEquals(output("3628800"), run(snippet));
    }
 
    @Test
    public void mainDT() {
       String snippet = "" +
-            " var i = (0 == 0);\n" +
-            "    if (i) {\n" +
-            "      i = (41 + 1);\n" +
-            "    } else {\n" +
-            "      print i;\n" +
-            "    }\n" +
+            " var i = (0 == 0);" +
+            "    if (i) {" +
+            "      i = (41 + 1);" +
+            "    } else {" +
+            "      print i;" +
+            "    }" +
             "    print i;";
       Assert.assertEquals(output("42"), run(snippet));
    }
@@ -33,84 +33,83 @@ public class SampleTest extends BaseTest {
    @Test
    public void mainFCF() {
       String snippet = "" +
-            "    procedure adder(n, ref f) {\n" +
-            "      f = (\\m -> (n + m));\n" +
-            "    }\n" +
-            "    var double = (\\x -> (x + x));\n" +
-            "    var inc = (\\x -> (x + 1));\n" +
-            "    var comp = (\\f -> (\\g -> (\\x -> (f @ (g @ x)))));\n" +
-            "    var toOdd = ((comp @ inc) @ double);\n" +
-            "    print (toOdd @ 3);\n" +
-            "    print (toOdd @ 9);\n" +
-            "    adder(4, inc);\n" +
-            "    print (inc @ 1);\n" +
-            "    print (inc @ 0);\n";
-
+            "    procedure adder(n, ref f) {" +
+            "      f = (\\m -> (n + m));" +
+            "    }" +
+            "    var double = (\\x -> (x + x));" +
+            "    var inc = (\\x -> (x + 1));" +
+            "    var comp = (\\f -> (\\g -> (\\x -> (f @ (g @ x)))));" +
+            "    var toOdd = ((comp @ inc) @ double);" +
+            "    print (toOdd @ 3);" +
+            "    print (toOdd @ 9);" +
+            "    adder(4, inc);" +
+            "    print (inc @ 1);" +
+            "    print (inc @ 0);";
       Assert.assertEquals(outputs("7 & 19 & 5 & 4"), run(snippet));
    }
 
    @Test
    public void mainNest() {
       String snippet = "" +
-            "    var i = 0;\n" +
-            "    if ((i == 0)) {\n" +
-            "      var i = 1;\n" +
-            "      print i;\n" +
-            "    } else {\n" +
-            "      i = 3;\n" +
-            "    }\n" +
-            "    print i;\n";
+            "    var i = 0;" +
+            "    if ((i == 0)) {" +
+            "      var i = 1;" +
+            "      print i;" +
+            "    } else {" +
+            "      i = 3;" +
+            "    }" +
+            "    print i;";
       Assert.assertEquals(outputs("1 & 0"), run(snippet));
    }
 
    @Test
    public void mainProc() {
       String snippet = "" +
-            "    procedure gauss(limit) {\n" +
-            "      var t = 0;\n" +
-            "      var i = 0;\n" +
-            "      while ((i < limit)) {\n" +
-            "        i = (i + 1);\n" +
-            "        t = (t + i);\n" +
-            "      }\n" +
-            "      print t;\n" +
-            "    }\n" +
-            "    procedure double(x) {\n" +
-            "      print (x + x);\n" +
-            "    }\n" +
-            "    procedure sum(n, a) {\n" +
-            "      if ((0 < n)) {\n" +
-            "        sum((n - 1), (a + n));\n" +
-            "      } else {\n" +
-            "        print a;\n" +
-            "      }\n" +
-            "    }\n" +
-            "    var n = 97207;\n" +
-            "    gauss(5);\n" +
-            "    double(21);\n" +
-            "    gauss(10);\n" +
-            "    sum(10, 0);\n" +
-            "    print n;\n";
+            "    procedure gauss(limit) {" +
+            "      var t = 0;" +
+            "      var i = 0;" +
+            "      while ((i < limit)) {" +
+            "        i = (i + 1);" +
+            "        t = (t + i);" +
+            "      }" +
+            "      print t;" +
+            "    }" +
+            "    procedure double(x) {" +
+            "      print (x + x);" +
+            "    }" +
+            "    procedure sum(n, a) {" +
+            "      if ((0 < n)) {" +
+            "        sum((n - 1), (a + n));" +
+            "      } else {" +
+            "        print a;" +
+            "      }" +
+            "    }" +
+            "    var n = 97207;" +
+            "    gauss(5);" +
+            "    double(21);" +
+            "    gauss(10);" +
+            "    sum(10, 0);" +
+            "    print n;";
       Assert.assertEquals(outputs("15 & 42 & 55 & 55 & 97207"), run(snippet));
    }
 
    @Test
    public void mainRef() {
       String snippet = "" +
-            "    procedure byref(ref x, ref y) {\n" +
-            "      redirect(x);\n" +
-            "      redirect(y);\n" +
-            "      print (x + y);\n" +
-            "    }\n" +
-            "    procedure redirect(ref x) {\n" +
-            "      inc(x);\n" +
-            "    }\n" +
-            "    procedure inc(ref y) {\n" +
-            "      y = (y + 1);\n" +
-            "    }\n" +
-            "    var z = 25;\n" +
-            "    byref(z, 23);\n" +
-            "    print z;\n";
+            "    procedure byref(ref x, ref y) {" +
+            "      redirect(x);" +
+            "      redirect(y);" +
+            "      print (x + y);" +
+            "    }" +
+            "    procedure redirect(ref x) {" +
+            "      inc(x);" +
+            "    }" +
+            "    procedure inc(ref y) {" +
+            "      y = (y + 1);" +
+            "    }" +
+            "    var z = 25;" +
+            "    byref(z, 23);" +
+            "    print z;";
       Assert.assertEquals(outputs("50 & 26"), run(snippet));
    }
 }
