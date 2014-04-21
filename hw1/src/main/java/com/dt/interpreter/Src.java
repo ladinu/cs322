@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 enum Errors {
    LIST_VALUE_EXPECTED("ABORT: list value expected"),
-   NON_EMPTY_LIST_EXPECTED("ABORT: nonempty list expected"),
+   NON_EMPTY_LIST_EXPECTED("ABORT: nonempty list value expected"),
    BOOLEAN_VALUE_EXPECTED("ABORT: Boolean value expected"),
    INTEGER_VALUE_EXPECTED("ABORT: Integer value expected"),
    FIRST_CLASS_FUNCTION_EXPECTED("ABORT: First-class function expected"),
@@ -25,19 +25,19 @@ abstract class Value {
    abstract String show();
 
    boolean asBool() {
-      System.out.println(Errors.BOOLEAN_VALUE_EXPECTED.toString());
+      System.out.println(Errors.BOOLEAN_VALUE_EXPECTED);
       System.exit(1);
       return true; // Not reached
    }
 
    int asInt() {
-      System.out.println(Errors.INTEGER_VALUE_EXPECTED.toString());
+      System.out.println(Errors.INTEGER_VALUE_EXPECTED);
       System.exit(1);
       return 0; // Not reached
    }
 
    Value enter(Value val) {
-      System.out.println(Errors.FIRST_CLASS_FUNCTION_EXPECTED.toString());
+      System.out.println(Errors.FIRST_CLASS_FUNCTION_EXPECTED);
       System.exit(1);
       return null; // Not reached
    }
@@ -240,7 +240,7 @@ class Cons extends Expr {
 
    void checkIfLValue(Env env, Expr expr) {
       if ( !(expr.eval(env) instanceof LValue) ) {
-         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
+         System.out.println(Errors.LIST_VALUE_EXPECTED);
          System.exit(1);
       }
    }
@@ -252,7 +252,7 @@ class NonEmpty extends Expr {
 
    Value eval(Env env) {
       if (!isLValue(env, e)) {
-         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
+         System.out.println(Errors.LIST_VALUE_EXPECTED);
          System.exit(1);
       }
 
@@ -281,11 +281,11 @@ class Head extends Expr {
          NonEmptyList list = (NonEmptyList)e.eval(env);
          return list.getHead();
       } else if (e.eval(env) instanceof EmptyList) {
-         System.out.println(Errors.NON_EMPTY_LIST_EXPECTED.toString());
+         System.out.println(Errors.NON_EMPTY_LIST_EXPECTED);
          System.exit(1);
          return new BValue(false); // Not reached
       } else {
-         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
+         System.out.println(Errors.LIST_VALUE_EXPECTED);
          System.exit(1);
          return new BValue(false); // Not reached
       }
@@ -305,11 +305,11 @@ class Tail extends Expr {
          NonEmptyList list = (NonEmptyList)e.eval(env);
          return list.getTail();
       } else if (e.eval(env) instanceof EmptyList) {
-         System.out.println(Errors.NON_EMPTY_LIST_EXPECTED.toString());
+         System.out.println(Errors.NON_EMPTY_LIST_EXPECTED);
          System.exit(1);
          return new BValue(false); // Not reached
       } else {
-         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
+         System.out.println(Errors.LIST_VALUE_EXPECTED);
          System.exit(1);
          return new BValue(false); // Not reached
       }
@@ -499,7 +499,7 @@ class Case extends Stmt {
          env = new ValEnv(h, head, new ValEnv(t, tail, env));
          return ifNonEmpty.exec(prog, env);
       } else {
-         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
+         System.out.println(Errors.LIST_VALUE_EXPECTED);
          System.exit(1);
          return env;
       }
@@ -539,7 +539,7 @@ class For extends Stmt {
       } else if (evaledList instanceof EmptyList) {
          return env;
       } else {
-         System.out.println(Errors.LIST_VALUE_EXPECTED.toString());
+         System.out.println(Errors.LIST_VALUE_EXPECTED);
          System.exit(1);
          return env; // Not reached
       }
@@ -576,7 +576,7 @@ class Program {
             return;
          }
       }
-      System.out.println(Errors.CANNOT_FIND_FUNCTION.toString() + name);
+      System.out.println(Errors.CANNOT_FIND_FUNCTION + name);
       System.exit(1);
    }
 
@@ -637,7 +637,7 @@ class Proc {
 
    void call(Program prog, Env env, Expr[] actuals) {
       if (actuals.length != formals.length) {
-         System.out.println(Errors.WRONG_NUMBER_OF_ARGUMENTS.toString() + name);
+         System.out.println(Errors.WRONG_NUMBER_OF_ARGUMENTS + name);
          System.exit(1);
       }
       Env newenv = null;
