@@ -17,16 +17,15 @@ public abstract class BaseTest {
       return  new ValEnv("null", null, null);
    }
 
-   // Helper method to format expected output
-   public String output(String expectedOutput) {
+   private String prependOutput(String expectedOutput) {
       return "Output: " + expectedOutput + "\n";
    }
 
-   public String outputs(String expected) {
-
+   // Helper method to format expected output
+   public String output(String expected) {
       String outStr = "";
       for (String i: expected.split(" & ")) {
-         outStr += output(i);
+         outStr += prependOutput(i);
       }
       return outStr;
    }

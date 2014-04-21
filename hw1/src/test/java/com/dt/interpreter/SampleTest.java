@@ -45,7 +45,7 @@ public class SampleTest extends BaseTest {
             "    adder(4, inc);" +
             "    print (inc @ 1);" +
             "    print (inc @ 0);";
-      Assert.assertEquals(outputs("7 & 19 & 5 & 4"), run(snippet));
+      Assert.assertEquals(output("7 & 19 & 5 & 4"), run(snippet));
    }
 
    @Test
@@ -59,7 +59,7 @@ public class SampleTest extends BaseTest {
             "      i = 3;" +
             "    }" +
             "    print i;";
-      Assert.assertEquals(outputs("1 & 0"), run(snippet));
+      Assert.assertEquals(output("1 & 0"), run(snippet));
    }
 
    @Test
@@ -90,7 +90,7 @@ public class SampleTest extends BaseTest {
             "    gauss(10);" +
             "    sum(10, 0);" +
             "    print n;";
-      Assert.assertEquals(outputs("15 & 42 & 55 & 55 & 97207"), run(snippet));
+      Assert.assertEquals(output("15 & 42 & 55 & 55 & 97207"), run(snippet));
    }
 
    @Test
@@ -110,7 +110,7 @@ public class SampleTest extends BaseTest {
             "    var z = 25;" +
             "    byref(z, 23);" +
             "    print z;";
-      Assert.assertEquals(outputs("50 & 26"), run(snippet));
+      Assert.assertEquals(output("50 & 26"), run(snippet));
    }
 }
 
