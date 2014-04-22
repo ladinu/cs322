@@ -43,7 +43,7 @@ public abstract class BaseTest {
       exit.checkAssertionAfterwards(new Assertion() {
          @Override
          public void checkAssertion() throws Exception {
-            Assert.assertEquals(expectedMsg.toString()+"\n", log.getLog());
+            Assert.assertEquals(expectedMsg+"\n", log.getLog());
          }
       });
       Snippet.run(snippet);

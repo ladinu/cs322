@@ -36,6 +36,11 @@ abstract class Value {
       return 0; // Not reached
    }
 
+   LValue asList() {
+      System.out.println(Errors.LIST_VALUE_EXPECTED);
+      System.exit(1);
+      return null; // Not reached
+   }
 
    Value enter(Value val) {
       System.out.println(Errors.FIRST_CLASS_FUNCTION_EXPECTED);
@@ -79,10 +84,30 @@ class FValue extends Value {
 }
 
 abstract class LValue extends Value {
+   LValue asList() {
+      return this;
+   }
+
+   boolean isEmptyList() {
+      return false;
+   }
+
+   boolean isNonEmptyList() {
+      return false;
+   }
+
+   NonEmptyList getNonEmptyList() {
+      System.out.println(Errors.NON_EMPTY_LIST_EXPECTED);
+      System.exit(1);
+      return null;
+   }
 }
 
 class EmptyList extends LValue {
    String show() { return "[]"; }
+   boolean isEmptyList() {
+      return true;
+   }
 }
 
 class NonEmptyList extends LValue {
@@ -107,6 +132,13 @@ class NonEmptyList extends LValue {
       return str;
    }
 
+   boolean isNonEmptyList() {
+      return true;
+   }
+
+   NonEmptyList getNonEmptyList() {
+      return this;
+   }
    Value getHead() {
       return head;
    }
@@ -230,20 +262,11 @@ class Cons extends Expr {
    }
 
    Value eval(Env env) {
-      checkIfLValue(env, tail);
-      LValue tailEnd = (LValue)tail.eval(env);
-      return new NonEmptyList(head.eval(env), tailEnd);
+      return new NonEmptyList(head.eval(env), tail.eval(env).asList());
    }
 
    String show() {
       return "cons(" + head.show() + ", " + tail.show() +")";
-   }
-
-   void checkIfLValue(Env env, Expr expr) {
-      if ( !(expr.eval(env) instanceof LValue) ) {
-         System.out.println(Errors.LIST_VALUE_EXPECTED);
-         System.exit(1);
-      }
    }
 }
 
@@ -252,12 +275,7 @@ class NonEmpty extends Expr {
    NonEmpty(Expr e) { this.e = e;}
 
    Value eval(Env env) {
-      if (!isLValue(env, e)) {
-         System.out.println(Errors.LIST_VALUE_EXPECTED);
-         System.exit(1);
-      }
-
-      if (e.eval(env) instanceof NonEmptyList ) {
+      if (e.eval(env).asList().isNonEmptyList()) {
          return new BValue(true);
       } else {
          return new BValue(false);
@@ -267,10 +285,6 @@ class NonEmpty extends Expr {
    String show() {
       return "nonEmpty(" + e.show() + ")";
    }
-
-   static boolean isLValue(Env env, Expr e) {
-      return e.eval(env) instanceof LValue;
-   }
 }
 
 class Head extends Expr {
@@ -278,18 +292,7 @@ class Head extends Expr {
    Head(Expr e) {this.e = e;}
 
    Value eval(Env env) {
-      if (e.eval(env) instanceof NonEmptyList) {
-         NonEmptyList list = (NonEmptyList)e.eval(env);
-         return list.getHead();
-      } else if (e.eval(env) instanceof EmptyList) {
-         System.out.println(Errors.NON_EMPTY_LIST_EXPECTED);
-         System.exit(1);
-         return new BValue(false); // Not reached
-      } else {
-         System.out.println(Errors.LIST_VALUE_EXPECTED);
-         System.exit(1);
-         return new BValue(false); // Not reached
-      }
+      return e.eval(env).asList().getNonEmptyList().getHead();
    }
 
    String show() {
@@ -302,18 +305,7 @@ class Tail extends Expr {
    Tail(Expr e) { this.e = e;}
 
    Value eval(Env env) {
-      if (e.eval(env) instanceof NonEmptyList) {
-         NonEmptyList list = (NonEmptyList)e.eval(env);
-         return list.getTail();
-      } else if (e.eval(env) instanceof EmptyList) {
-         System.out.println(Errors.NON_EMPTY_LIST_EXPECTED);
-         System.exit(1);
-         return new BValue(false); // Not reached
-      } else {
-         System.out.println(Errors.LIST_VALUE_EXPECTED);
-         System.exit(1);
-         return new BValue(false); // Not reached
-      }
+      return e.eval(env).asList().getNonEmptyList().getTail();
    }
 
    String show() {
@@ -489,6 +481,14 @@ class Case extends Stmt {
    }
 
    Env exec(Program prog, Env env) {
+      LValue list = expr.eval(env).asList();
+      if (list.isEmptyList()) {
+         ifEmpty.exec(prog, env);
+      } else {
+         Value head = list.getNonEmptyList().getHead();
+         Value tail = list.getNonEmptyList().getTail();
+         Env consEnv = new ValEnv(h, head, new ValEnv(t, tail, env));
+      }
       Value val = expr.eval(env);
       if (val instanceof EmptyList) {
          ifEmpty.exec(prog, env);

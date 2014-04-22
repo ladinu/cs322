@@ -20,12 +20,6 @@ public class NonEmptyTest extends BaseTest {
    }
 
    @Test
-   public void isLValue() throws Exception {
-      Assert.assertTrue(NonEmpty.isLValue(getEmptyEnv(), new Nil()));
-      Assert.assertFalse(NonEmpty.isLValue(getEmptyEnv(), new Int(1)));
-   }
-
-   @Test
    public void testShow() throws Exception {
       Assert.assertEquals("print nonEmpty([]);\n\n", showSnippet("print nonEmpty([]);"));
    }

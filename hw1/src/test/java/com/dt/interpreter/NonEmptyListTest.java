@@ -49,4 +49,26 @@ public class NonEmptyListTest {
       ArrayList<Value> actual = list.getArrayList();
       Assert.assertTrue(expected.equals(list.getArrayList()));
    }
+
+   @Test
+   public void testIsNonEmptyList() {
+      NonEmptyList l = getList();
+      Assert.assertTrue("expecting to be non empty list", l.isNonEmptyList());
+   }
+
+   @Test
+   public void testIsEmptyList() {
+      NonEmptyList l = getList();
+      Assert.assertFalse("expecting to be non empty list", l.isEmptyList());
+   }
+
+   @Test
+   public void testGetNonEmptyList() {
+      NonEmptyList l = getList();
+      Assert.assertTrue(l.getNonEmptyList() == l);
+   }
+
+   private NonEmptyList getList() {
+      return new NonEmptyList(new IValue(1), new EmptyList());
+   }
 }
