@@ -488,20 +488,7 @@ class Case extends Stmt {
          Value head = list.getNonEmptyList().getHead();
          Value tail = list.getNonEmptyList().getTail();
          Env consEnv = new ValEnv(h, head, new ValEnv(t, tail, env));
-      }
-      Value val = expr.eval(env);
-      if (val instanceof EmptyList) {
-         ifEmpty.exec(prog, env);
-      } else if (val instanceof NonEmptyList) {
-         Env consEnv;
-         NonEmptyList list = (NonEmptyList)val;
-         Value head = list.getHead();
-         Value tail = list.getTail();
-         consEnv = new ValEnv(h, head, new ValEnv(t, tail, env));
          ifNonEmpty.exec(prog, consEnv);
-      } else {
-         System.out.println(Errors.LIST_VALUE_EXPECTED);
-         System.exit(1);
       }
       return env;
    }
@@ -528,24 +515,15 @@ class For extends Stmt {
    }
 
    Env exec(Program prog, Env env) {
-      Value evaledList = list.eval(env);
-      Env loopEnv;
-
-      if (evaledList instanceof NonEmptyList) {
-         NonEmptyList l = (NonEmptyList)evaledList;
-         loopEnv = new ValEnv(v, new EmptyList(), env);
-         for(Value val : l.getArrayList()) {
+      LValue l = list.eval(env).asList();
+      if (l.isNonEmptyList()) {
+         Env loopEnv = new ValEnv(v, null, env);
+         for(Value val: l.getNonEmptyList().getArrayList()) {
             loopEnv.setValue(val);
             body.exec(prog, loopEnv);
          }
-         return env;
-      } else if (evaledList instanceof EmptyList) {
-         return env;
-      } else {
-         System.out.println(Errors.LIST_VALUE_EXPECTED);
-         System.exit(1);
-         return env; // Not reached
       }
+      return env;
    }
 
    void print(int ind) {
