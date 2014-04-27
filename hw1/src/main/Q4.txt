@@ -1,0 +1,46 @@
+procedure reverse(list, ref out) { 
+  for (i in list) { 
+     out = cons(i, out); 
+  } 
+} 
+
+procedure map(f, list, ref out) { 
+  // Reverse the list first
+  var tmp = []; 
+  for (i in list) { 
+     tmp = cons(i, tmp); 
+  }
+
+  for (i in tmp) { 
+     out = cons((f @ i), out); 
+  } 
+}
+
+
+procedure count(val, list, ref num) { 
+  num = 0; 
+  for (i in list) { 
+     if (i == val) { 
+        num = num + 1; 
+     } else { var junk = 0;} 
+  } 
+} 
+
+procedure position(val, list, ref pos) {" +
+  pos = 0; 
+  var notFound = (1==1); // True
+  var index = 1; 
+  for (i in list) { 
+     if (notFound) { 
+        if (i == val) { 
+           pos = index; 
+           notFound = (1==0); // False 
+        } else { 
+           index = index + 1; 
+        } 
+     } else { 
+        var junk = 0; 
+     } 
+  } 
+} 
+
