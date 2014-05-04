@@ -1,0 +1,3 @@
+Before turning in:
+   1. Change 'import com.compiler.hw2.ast.*' -> 'import ast.*'
+   1. Change 'import com.compiler.hw2.ir.*' -> 'import ir.*'
