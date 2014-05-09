@@ -22,3 +22,6 @@ hw1/.idea/
 hw1/hw1.iml
 
 .DS_Store
+
+# Ignore .idea files
+hw2/.idea/

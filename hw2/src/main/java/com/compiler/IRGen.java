@@ -286,7 +286,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // 2. Generate code
@@ -299,7 +299,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // MethodDecl ---
@@ -322,7 +322,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   } 
 
   // VarDecl ---
@@ -340,7 +340,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // STATEMENTS
@@ -366,7 +366,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // Assign ---
@@ -383,7 +383,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // CallStmt ---
@@ -421,7 +421,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // If ---
@@ -435,7 +435,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // While ---
@@ -449,7 +449,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
   
   // Print ---
@@ -467,7 +467,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // Return ---  
@@ -483,7 +483,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // EXPRESSIONS
@@ -537,7 +537,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
   
   // Field ---
@@ -556,7 +556,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
   
   // 2. genAddr()
@@ -572,7 +572,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
   
   // Id ---
@@ -591,7 +591,7 @@ public class IRGen {
 
     //    ... need code
 
-
+    return null;
   }
 
   // This ---
