@@ -25,3 +25,5 @@ hw1/hw1.iml
 
 # Ignore .idea files
 hw2/.idea/
+hw2/target/
+hw2/hw2.iml

@@ -5,12 +5,11 @@
 //
 // (Starting version.)
 //
-package com.compiler;
 
 import java.util.*;
 import java.io.*;
-import com.compiler.ast.*;
-import com.compiler.ir.*;
+import ast.*;
+import ir.*;
 
 public class IRGen {
 
@@ -193,13 +192,6 @@ public class IRGen {
     }
   }
 
-  // TODO: remove this method before turning in
-  public String generate(String miniJava) throws Exception {
-    Ast.Program p = new astParser(new StringReader(miniJava)).Program();
-    IR.Program ir = IRGen.gen(p);
-    return ir.toString();
-  }
-
   // Sort ClassDecls, so that parent will be visited before children.
   //
   private static Ast.ClassDecl[] topoSort(Ast.ClassDecl[] classes) {
@@ -233,7 +225,6 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
 
     return cinfo;
@@ -293,9 +284,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // 2. Generate code
@@ -307,9 +297,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // MethodDecl ---
@@ -331,9 +320,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   } 
 
   // VarDecl ---
@@ -350,9 +338,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // STATEMENTS
@@ -377,9 +364,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // Assign ---
@@ -395,9 +381,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // CallStmt ---
@@ -434,9 +419,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // If ---
@@ -449,9 +433,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // While ---
@@ -464,9 +447,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
   
   // Print ---
@@ -483,9 +465,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // Return ---  
@@ -500,9 +481,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // EXPRESSIONS
@@ -555,9 +535,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
   
   // Field ---
@@ -575,9 +554,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
   
   // 2. genAddr()
@@ -592,9 +570,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
   
   // Id ---
@@ -612,9 +589,8 @@ public class IRGen {
 
 
     //    ... need code
-    // TODO: implement
 
-    return null;
+
   }
 
   // This ---
