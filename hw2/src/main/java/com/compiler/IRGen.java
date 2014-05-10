@@ -346,12 +346,35 @@ public class IRGen {
   //   Straightforward -- generate a IR.Func for each mthdDecl.
   //
   static List<IR.Func> gen(Ast.ClassDecl n, ClassInfo cinfo) throws Exception {
+    Env progEnv = new Env();
+    ArrayList<IR.Func> funcList = new ArrayList<IR.Func>();
 
+    for (Ast.MethodDecl mthd : n.mthds) {
+      String funcName = cinfo.name + "_" + mthd.nm;
 
-    //    ... need code
-    // TODO: implement
+      // Get list of params with type String
+      ArrayList<String> params = new ArrayList<String>();
+      for (Ast.Param param: mthd.params) {
+        params.add(param.nm);
+      }
+      // Get list of locals with type String
+      ArrayList<String> locals = new ArrayList<String>();
+      for (Ast.VarDecl var: mthd.vars) {
+        locals.add(var.nm);
+      }
+      // Get a list of IR instructions for function body
+      ArrayList<IR.Inst> body = new ArrayList<IR.Inst>();
+      for (Ast.Stmt stmt : mthd.stmts) {
+        // TODO: Should each function have a new environment?
+        for (IR.Inst inst : gen(stmt, cinfo, progEnv)) {
+          body.add(inst);
+        }
+      }
 
-    throw new Exception("gen CLASS_DECL");
+      funcList.add(new IR.Func(funcName, params, locals, body));
+    }
+
+    return funcList;
   }
 
   // MethodDecl ---
