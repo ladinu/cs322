@@ -7,6 +7,7 @@
 //
 package com.compiler;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.io.*;
 import com.compiler.ast.*;
@@ -229,12 +230,49 @@ public class IRGen {
   //
   private static ClassInfo createClassInfo(Ast.ClassDecl n) throws Exception {
     ClassInfo cinfo = (n.pnm != null) ?
-      new ClassInfo(n, classInfos.get(n.pnm)) : new ClassInfo(n);
+        new ClassInfo(n, classInfos.get(n.pnm)) : new ClassInfo(n);
 
+    for (Ast.MethodDecl method: n.mthds) {
+      if(!cinfo.vtable.contains(method)) {
+        cinfo.vtable.add(method.nm);
+      }
+      if (method.nm.equals("main")) {
+        cinfo.isMainClass = true;
+      }
+    }
 
-    //    ... need code
-    // TODO: implement
+    int offset = cinfo.objSize;
+    List<Ast.VarDecl> fields = Arrays.asList(n.flds);
+    Iterator<Ast.VarDecl> fieldItr = fields.iterator();
 
+    if (fieldItr.hasNext()) {
+      cinfo.offsets.put(fieldItr.next().nm, offset);
+    }
+
+    for(;fieldItr.hasNext();) {
+      Ast.VarDecl field = fieldItr.next();
+      if (field.t instanceof Ast.IntType) {
+        offset = offset + IR.Type.INT.size;
+      } else if (field.t instanceof Ast.BoolType) {
+        offset = offset + IR.Type.BOOL.size;
+      } else {
+        offset = offset + IR.Type.PTR.size;
+      }
+      cinfo.offsets.put(field.nm, offset);
+    }
+
+    int size = cinfo.objSize;
+
+    for(Ast.VarDecl field: n.flds) {
+      if (field.t instanceof Ast.IntType) {
+        size = size + IR.Type.INT.size;
+      } else if (field.t instanceof Ast.BoolType) {
+        size = size + IR.Type.BOOL.size;
+      } else {
+        size = size + IR.Type.PTR.size;
+      }
+    }
+    cinfo.objSize = size;
 
     return cinfo;
   }
@@ -290,12 +328,16 @@ public class IRGen {
   // (Skip this method if class is the static class containing "main".)
   //
   static IR.Data genData(Ast.ClassDecl n, ClassInfo cinfo) throws Exception {
+    if (n.nm.equals("main")) return null;
 
+    String pnm  = (cinfo.parent == null) ? "" : cinfo.parent.name;
+    ArrayList<IR.Global> globalList = new ArrayList<IR.Global>();
 
-    //    ... need code
-    // TODO: implement
+    for (Ast.MethodDecl mthd: n.mthds) {
+      globalList.add(new IR.Global(pnm + "_" + mthd.nm));
+    }
 
-    return null;
+    return new IR.Data(new IR.Global("class_" + cinfo.name), cinfo.objSize, globalList);
   }
 
   // 2. Generate code
@@ -309,7 +351,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen CLASS_DECL");
   }
 
   // MethodDecl ---
@@ -333,8 +375,8 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
-  } 
+    throw new Exception("gen METHOD_DECL");
+  }
 
   // VarDecl ---
   // Type t;
@@ -352,7 +394,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen VAR_DECL");
   }
 
   // STATEMENTS
@@ -379,7 +421,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen BLOCK");
   }
 
   // Assign ---
@@ -397,7 +439,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen Assign");
   }
 
   // CallStmt ---
@@ -436,7 +478,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("handleCall");
   }
 
   // If ---
@@ -451,7 +493,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen IF cinfo, env");
   }
 
   // While ---
@@ -466,7 +508,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen WHILE cinfo, env");
   }
   
   // Print ---
@@ -485,7 +527,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen PRINT cinfo, env");
   }
 
   // Return ---  
@@ -502,7 +544,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen RETURN cinfo, env");
   }
 
   // EXPRESSIONS
@@ -557,7 +599,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen NEW_OBJ cinfo, env");
   }
   
   // Field ---
@@ -577,7 +619,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen FIELD cinfo, env");
   }
   
   // 2. genAddr()
@@ -594,7 +636,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("genAddr FIELD cinfo, env");
   }
   
   // Id ---
@@ -614,7 +656,7 @@ public class IRGen {
     //    ... need code
     // TODO: implement
 
-    return null;
+    throw new Exception("gen ID cinfo, env");
   }
 
   // This ---
