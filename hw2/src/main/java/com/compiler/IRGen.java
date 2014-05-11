@@ -7,7 +7,6 @@
 //
 package com.compiler;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.io.*;
 import com.compiler.ast.*;
@@ -233,12 +232,10 @@ public class IRGen {
         new ClassInfo(n, classInfos.get(n.pnm)) : new ClassInfo(n);
 
     for (Ast.MethodDecl method: n.mthds) {
-      if(!cinfo.vtable.contains(method)) {
+      if(!cinfo.vtable.contains(method.nm)) {
         cinfo.vtable.add(method.nm);
       }
-      if (method.nm.equals("main")) {
-        cinfo.isMainClass = true;
-      }
+      cinfo.isMainClass = method.nm.equals("main");
     }
 
     int offset = cinfo.objSize;
@@ -397,6 +394,13 @@ public class IRGen {
     // Get a list of IR instructions for function body
     ArrayList<IR.Inst> body = new ArrayList<IR.Inst>();
     body.add(new IR.LabelDec("Begin"));
+
+    // Add Inst for VarDecls
+    for (Ast.VarDecl var: n.vars) {
+      body.addAll(gen(var, cinfo, env));
+    }
+
+    // Add Inst for all other statements
     for (Ast.Stmt stmt : n.stmts) {
       body.addAll(gen(stmt, cinfo, env));
     }
@@ -418,14 +422,19 @@ public class IRGen {
   // 1. If init exp exists, generate IR code for it and assign result to var
   // 2. Return generated code (or null if none)
   //
-  private static List<IR.Inst> gen(Ast.VarDecl n, ClassInfo cinfo, 
+  private static List<IR.Inst> gen(Ast.VarDecl n, ClassInfo cinfo,
 				    Env env) throws Exception {
+    ArrayList<IR.Inst> code = new ArrayList<IR.Inst>();
+    if (n.init == null) return code;
+    CodePack pack = gen(n.init, cinfo, env);
 
-
-    //    ... need code
-    // TODO: implement
-
-    throw new Exception("gen VAR_DECL");
+    if (pack != null) {
+      IR.Move mov = new IR.Move(new IR.Id(n.nm), pack.src);
+      code.addAll(pack.code);
+      code.add(mov);
+    }
+    code.addAll(pack.code);
+    return code;
   }
 
   // STATEMENTS
@@ -465,12 +474,20 @@ public class IRGen {
   // 3. otherwise, call genAddr() on lhs, and generate an IR.Store instruction
   //
   static List<IR.Inst> gen(Ast.Assign n, ClassInfo cinfo, Env env) throws Exception {
-
-
-    //    ... need code
     // TODO: implement
+    ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
+    CodePack rhsPack = gen(n.rhs, cinfo, env);
 
-    throw new Exception("gen Assign");
+    codes.addAll(rhsPack.code);
+
+    if (n.lhs instanceof Ast.Id && (env.get(((Ast.Id) n.lhs).nm) != null)) {
+      IR.Move mov = new IR.Move(new IR.Id(((Ast.Id) n.lhs).nm), rhsPack.src);
+      codes.add(mov);
+    } else {
+      throw new Exception("gen Assign");
+    }
+
+    return codes;
   }
 
   // CallStmt ---
@@ -667,12 +684,12 @@ public class IRGen {
   //   1.2 Add an IR.Load to get its value
   //
   static CodePack gen(Ast.Field n, ClassInfo cinfo, Env env) throws Exception {
-
-
-    //    ... need code
-    // TODO: implement
-
+    // Todo: Implement
     throw new Exception("gen FIELD cinfo, env");
+//    AddrPack addrPack = genAddr(n, cinfo, env);
+//    IR.Load load = new IR.Load(IR.Type.PTR, new IR.Id(n.nm), addrPack.addr);
+//    addrPack.code.add(load);
+//    return new CodePack(new Ast.ObjType(cinfo.name), new IR.Id(n.nm), addrPack.code);
   }
   
   // 2. genAddr()
@@ -684,11 +701,7 @@ public class IRGen {
   //   2.4 Generate an IR.Addr based on the offset
   //
   static AddrPack genAddr(Ast.Field n, ClassInfo cinfo, Env env) throws Exception {
-
-
-    //    ... need code
-    // TODO: implement
-
+    // Todo: Implement
     throw new Exception("genAddr FIELD cinfo, env");
   }
   
@@ -704,12 +717,16 @@ public class IRGen {
   //     on this new node
   //
   static CodePack gen(Ast.Id n, ClassInfo cinfo, Env env) throws Exception {
+    CodePack pack;
+    Ast.Type type = env.get(n.nm);
 
-
-    //    ... need code
-    // TODO: implement
-
-    throw new Exception("gen ID cinfo, env");
+    if (type != null) {
+      pack = new CodePack(type, new IR.Id(n.nm));
+    } else {
+      Ast.Field field = new Ast.Field(new Ast.This(), n.nm);
+      pack = gen(field, cinfo, env);
+    }
+    return pack;
   }
 
   // This ---
