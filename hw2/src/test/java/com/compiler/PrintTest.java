@@ -13,6 +13,7 @@ public class PrintTest extends BaseTest {
         "   Print \"Hello World!\"\n" +
         "   Print 1\n" +
         "   Print true\n" +
+        "   Print ()\n" +
         "   Print false\n";
 
     String ir = "" +
@@ -24,6 +25,7 @@ public class PrintTest extends BaseTest {
         " call _printStr(\"Hello World!\")\n" +
         " call _printInt(1)\n" +
         " call _printBool(true)\n" +
+        " call _print()\n" +
         " call _printBool(false)\n" +
         " return \n" +
         "End:\n" +

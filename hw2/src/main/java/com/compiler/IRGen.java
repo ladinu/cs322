@@ -219,10 +219,6 @@ public class IRGen {
     return cl.toArray(new Ast.ClassDecl[0]);
   }
 
-  // TODO: remove this before truning in
-  public static ClassInfo testCreateClassInfo(Ast.ClassDecl n) throws Exception {
-    return createClassInfo(n);
-  }
   // Create class info record
   //
   // Codegen Guideline: 
@@ -334,7 +330,7 @@ public class IRGen {
   static IR.Data genData(Ast.ClassDecl n, ClassInfo cinfo) throws Exception {
     if (cinfo.isMainClass) return null;
 
-    String pnm  = (cinfo.parent == null) ? "" : cinfo.parent.name;
+    String pnm  = (cinfo.parent == null) ? cinfo.name : cinfo.parent.name;
     ArrayList<IR.Global> globalList = new ArrayList<IR.Global>();
 
     for (Ast.MethodDecl mthd: n.mthds) {
@@ -592,12 +588,15 @@ public class IRGen {
   // 2. Otherwise, generate an IR.Return with no value
   //
   static List<IR.Inst> gen(Ast.Return n, ClassInfo cinfo, Env env) throws Exception {
-
-
-    //    ... need code
-    // TODO: implement
-
-    throw new Exception("gen RETURN cinfo, env");
+    ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
+    if (n.val == null) {
+      codes.add(new IR.Return(null));
+    } else {
+      CodePack pack = gen(n.val, cinfo, env);
+      codes.addAll(pack.code);
+      codes.add(new IR.Return(pack.src));
+    }
+    return codes;
   }
 
   // EXPRESSIONS
