@@ -219,6 +219,10 @@ public class IRGen {
     return cl.toArray(new Ast.ClassDecl[0]);
   }
 
+  // TODO: remove this before truning in
+  public static ClassInfo testCreateClassInfo(Ast.ClassDecl n) throws Exception {
+    return createClassInfo(n);
+  }
   // Create class info record
   //
   // Codegen Guideline: 
@@ -328,7 +332,7 @@ public class IRGen {
   // (Skip this method if class is the static class containing "main".)
   //
   static IR.Data genData(Ast.ClassDecl n, ClassInfo cinfo) throws Exception {
-    if (n.nm.equals("main")) return null;
+    if (cinfo.isMainClass) return null;
 
     String pnm  = (cinfo.parent == null) ? "" : cinfo.parent.name;
     ArrayList<IR.Global> globalList = new ArrayList<IR.Global>();
@@ -346,34 +350,10 @@ public class IRGen {
   //   Straightforward -- generate a IR.Func for each mthdDecl.
   //
   static List<IR.Func> gen(Ast.ClassDecl n, ClassInfo cinfo) throws Exception {
-    Env progEnv = new Env();
     ArrayList<IR.Func> funcList = new ArrayList<IR.Func>();
-
     for (Ast.MethodDecl mthd : n.mthds) {
-      String funcName = cinfo.name + "_" + mthd.nm;
-
-      // Get list of params with type String
-      ArrayList<String> params = new ArrayList<String>();
-      for (Ast.Param param: mthd.params) {
-        params.add(param.nm);
-      }
-      // Get list of locals with type String
-      ArrayList<String> locals = new ArrayList<String>();
-      for (Ast.VarDecl var: mthd.vars) {
-        locals.add(var.nm);
-      }
-      // Get a list of IR instructions for function body
-      ArrayList<IR.Inst> body = new ArrayList<IR.Inst>();
-      for (Ast.Stmt stmt : mthd.stmts) {
-        // TODO: Should each function have a new environment?
-        for (IR.Inst inst : gen(stmt, cinfo, progEnv)) {
-          body.add(inst);
-        }
-      }
-
-      funcList.add(new IR.Func(funcName, params, locals, body));
+      funcList.add(gen(mthd, cinfo));
     }
-
     return funcList;
   }
 
@@ -393,12 +373,43 @@ public class IRGen {
   // 5. Return an IR.Func with the above
   //
   static IR.Func gen(Ast.MethodDecl n, ClassInfo cinfo) throws Exception {
+    // Populate the env with params and local vars
+    Env env = new Env();
+    for (Ast.Param param : n.params) {
+      env.put(param.nm, param.t);
+    }
+    for (Ast.VarDecl var : n.vars) {
+      env.put(var.nm, var.t);
+    }
 
+    String funcName = (cinfo.isMainClass) ?
+        n.nm : cinfo.name + "_" + n.nm;
 
-    //    ... need code
-    // TODO: implement
+    // Get list of params with type String
+    ArrayList<String> params = new ArrayList<String>();
+    if (!cinfo.isMainClass) params.add("obj");
 
-    throw new Exception("gen METHOD_DECL");
+    for (Ast.Param param: n.params) {
+      params.add(param.nm);
+    }
+    // Get list of locals with type String
+    ArrayList<String> locals = new ArrayList<String>();
+    for (Ast.VarDecl var: n.vars) {
+      locals.add(var.nm);
+    }
+    // Get a list of IR instructions for function body
+    ArrayList<IR.Inst> body = new ArrayList<IR.Inst>();
+    body.add(new IR.LabelDec("Begin"));
+    for (Ast.Stmt stmt : n.stmts) {
+      body.addAll(gen(stmt, cinfo, env));
+    }
+    // Check if method return type is void
+    if (cinfo.methodType(n.nm) == null) {
+      body.add(new IR.Return(null));
+    }
+    body.add(new IR.LabelDec("End"));
+
+    return new IR.Func(funcName, params, locals, body);
   }
 
   // VarDecl ---
@@ -545,12 +556,22 @@ public class IRGen {
   //    to call
   //
   static List<IR.Inst> gen(Ast.Print n, ClassInfo cinfo, Env env) throws Exception {
+    ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
+    ArrayList<IR.Src>  args = new ArrayList<IR.Src>();
 
 
-    //    ... need code
-    // TODO: implement
+    if (n.arg == null) {
+      codes.add(new IR.Call(new IR.Global("print"), false, args));
 
-    throw new Exception("gen PRINT cinfo, env");
+    } else if (n.arg instanceof Ast.StrLit) {
+      String argStr = ((Ast.StrLit)n.arg).s;
+      IR.StrLit arg = new IR.StrLit(argStr);
+      args.add(arg);
+      codes.add(new IR.Call(new IR.Global("printStr"), false, args));
+    } else {
+      throw new Exception("gen PRINT cinfo, env");
+    }
+    return codes;
   }
 
   // Return ---  

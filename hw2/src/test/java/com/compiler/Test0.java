@@ -13,16 +13,15 @@ public class Test0 extends BaseTest {
         "   Print \"Hello World!\"\n";
 
     String ir = "" +
-        "# IR Program" +
-        "" +
-        "_main ()" +
-        "{" +
-        "Begin:" +
-        " call _printStr(\"Hello World!\")" +
-        " return " +
-        "End:" +
-        "}";
-
+        "# IR Program\n" +
+        "\n" +
+        "_main ()\n" +
+        "{\n" +
+        "Begin:\n" +
+        " call _printStr(\"Hello World!\")\n" +
+        " return \n" +
+        "End:\n" +
+        "}\n";
     tst(mj, ir);
   }
 }
