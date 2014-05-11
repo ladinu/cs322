@@ -263,10 +263,11 @@ public class IRGen {
 
     int size = cinfo.objSize;
 
-    for(Ast.VarDecl field: n.flds) {
-      if (field.t instanceof Ast.IntType) {
+    for(Ast.MethodDecl method: n.mthds) {
+      Ast.Type type = cinfo.methodType(method.nm);
+      if (type instanceof Ast.IntType) {
         size = size + IR.Type.INT.size;
-      } else if (field.t instanceof Ast.BoolType) {
+      } else if (type instanceof Ast.BoolType) {
         size = size + IR.Type.BOOL.size;
       } else {
         size = size + IR.Type.PTR.size;
@@ -333,8 +334,8 @@ public class IRGen {
     String pnm  = (cinfo.parent == null) ? cinfo.name : cinfo.parent.name;
     ArrayList<IR.Global> globalList = new ArrayList<IR.Global>();
 
-    for (Ast.MethodDecl mthd: n.mthds) {
-      globalList.add(new IR.Global(pnm + "_" + mthd.nm));
+    for (String method : cinfo.vtable) {
+      globalList.add(new IR.Global(pnm + "_" + method));
     }
 
     return new IR.Data(new IR.Global("class_" + cinfo.name), cinfo.objSize, globalList);
