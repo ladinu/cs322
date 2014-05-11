@@ -562,14 +562,23 @@ public class IRGen {
 
     if (n.arg == null) {
       codes.add(new IR.Call(new IR.Global("print"), false, args));
-
     } else if (n.arg instanceof Ast.StrLit) {
       String argStr = ((Ast.StrLit)n.arg).s;
       IR.StrLit arg = new IR.StrLit(argStr);
       args.add(arg);
       codes.add(new IR.Call(new IR.Global("printStr"), false, args));
     } else {
-      throw new Exception("gen PRINT cinfo, env");
+      CodePack codePack = gen(n.arg, cinfo, env);
+      codes.addAll(codePack.code);
+      args.add(codePack.src);
+
+      if (codePack.type instanceof Ast.BoolType) {
+        codes.add(new IR.Call(new IR.Global("printBool"), false, args));
+      } else if (codePack.type instanceof Ast.IntType) {
+        codes.add(new IR.Call(new IR.Global("printInt"), false, args));
+      } else {
+        throw new Exception("cannot print " + codePack.type.toString());
+      }
     }
     return codes;
   }
