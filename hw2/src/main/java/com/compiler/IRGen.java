@@ -238,40 +238,34 @@ public class IRGen {
       cinfo.isMainClass = method.nm.equals("main");
     }
 
-    int offset = cinfo.objSize;
-    List<Ast.VarDecl> fields = Arrays.asList(n.flds);
-    Iterator<Ast.VarDecl> fieldItr = fields.iterator();
-
-    if (fieldItr.hasNext()) {
-      cinfo.offsets.put(fieldItr.next().nm, offset);
-    }
-
-    for(;fieldItr.hasNext();) {
-      Ast.VarDecl field = fieldItr.next();
-      if (field.t instanceof Ast.IntType) {
-        offset = offset + IR.Type.INT.size;
-      } else if (field.t instanceof Ast.BoolType) {
-        offset = offset + IR.Type.BOOL.size;
-      } else {
-        offset = offset + IR.Type.PTR.size;
-      }
-      cinfo.offsets.put(field.nm, offset);
-    }
 
     int size = cinfo.objSize;
+    int offset = 0;
+    boolean flag = true;
 
-    for(Ast.MethodDecl method: n.mthds) {
-      Ast.Type type = cinfo.methodType(method.nm);
-      if (type instanceof Ast.IntType) {
-        size = size + IR.Type.INT.size;
-      } else if (type instanceof Ast.BoolType) {
-        size = size + IR.Type.BOOL.size;
+    for (Ast.VarDecl field : n.flds) {
+
+      int fieldSize;
+      if (field.t instanceof Ast.IntType) {
+        fieldSize = IR.Type.INT.size;
+      } else if (field.t instanceof Ast.BoolType) {
+        fieldSize = IR.Type.BOOL.size;
       } else {
-        size = size + IR.Type.PTR.size;
+        fieldSize = IR.Type.PTR.size;
+      }
+
+      size += fieldSize;
+
+      if (flag) {
+        cinfo.offsets.put(field.nm, 0);
+        flag = false;
+      } else {
+        offset += fieldSize;
+        cinfo.offsets.put(field.nm, offset);
       }
     }
-    cinfo.objSize = size;
 
+    cinfo.objSize = size;
     return cinfo;
   }
 
@@ -335,7 +329,12 @@ public class IRGen {
       globalList.add(new IR.Global(pnm + "_" + method));
     }
 
-    return new IR.Data(new IR.Global("class_" + cinfo.name), cinfo.objSize, globalList);
+    int heapSize = 0;
+    for (Ast.VarDecl field : n.flds) {
+      heapSize += cinfo.fieldOffset(field.nm);
+    }
+
+    return new IR.Data(new IR.Global("class_" + cinfo.name), heapSize, globalList);
   }
 
   // 2. Generate code
@@ -433,7 +432,6 @@ public class IRGen {
       code.addAll(pack.code);
       code.add(mov);
     }
-    code.addAll(pack.code);
     return code;
   }
 
@@ -564,7 +562,6 @@ public class IRGen {
   // (See class notes.)
   //
   static List<IR.Inst> gen(Ast.While n, ClassInfo cinfo, Env env) throws Exception {
-    // TODO: implement
     List<IR.Inst> codes = new ArrayList<IR.Inst>();
 
     IR.Label L1 = new IR.Label();
@@ -686,12 +683,24 @@ public class IRGen {
   //     the allocated space
   //
   static CodePack gen(Ast.NewObj n, ClassInfo cinfo, Env env) throws Exception {
-
-
-    //    ... need code
     // TODO: implement
+    ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
+    ArrayList<IR.Src>  args = new ArrayList<IR.Src>();
 
-    throw new Exception("gen NEW_OBJ cinfo, env");
+    ClassInfo newCinfo = classInfos.get(n.nm);
+    args.add(new IR.IntLit(newCinfo.objSize));
+
+    IR.Temp t0 = new IR.Temp();
+    IR.Call malloc = new IR.Call(new IR.Global("malloc"),false, args, t0);
+
+    IR.Addr addr = new IR.Addr(t0, 0);
+
+    IR.Store store = new IR.Store(IR.Type.PTR, addr, new IR.Global("class_"+newCinfo.name));
+
+    codes.add(malloc);
+    codes.add(store);
+
+    return new CodePack(new Ast.ObjType(newCinfo.name), t0, codes);
   }
   
   // Field ---
@@ -706,7 +715,7 @@ public class IRGen {
   //   1.2 Add an IR.Load to get its value
   //
   static CodePack gen(Ast.Field n, ClassInfo cinfo, Env env) throws Exception {
-    // Todo: Implement
+    // TODO: Implement
     throw new Exception("gen FIELD cinfo, env");
 //    AddrPack addrPack = genAddr(n, cinfo, env);
 //    IR.Load load = new IR.Load(IR.Type.PTR, new IR.Id(n.nm), addrPack.addr);
@@ -723,7 +732,7 @@ public class IRGen {
   //   2.4 Generate an IR.Addr based on the offset
   //
   static AddrPack genAddr(Ast.Field n, ClassInfo cinfo, Env env) throws Exception {
-    // Todo: Implement
+    // TODO: Implement
     throw new Exception("genAddr FIELD cinfo, env");
   }
   
