@@ -11,6 +11,7 @@ import java.util.*;
 import java.io.*;
 import com.compiler.ast.*;
 import com.compiler.ir.*;
+import com.sun.org.apache.bcel.internal.classfile.Code;
 
 public class IRGen {
 
@@ -175,6 +176,19 @@ public class IRGen {
   // Constant nodes for convenience 
   private static final Ast.Type AstIntType = new Ast.IntType();
   private static final Ast.Type AstBoolType = new Ast.BoolType();
+
+  // Helper methods
+  private static final IR.Type toIRType(Ast.Type t) {
+    if (t instanceof Ast.BoolType) {
+      return IR.Type.BOOL;
+    } else if (t instanceof Ast.IntType) {
+      return IR.Type.INT;
+    } else if (t instanceof Ast.ObjType) {
+      return IR.Type.PTR;
+    } else {
+      throw new Error("Unknown type " + t);
+    }
+  }
 
 
   //------------------------------------------------------------------------------
@@ -472,7 +486,6 @@ public class IRGen {
   // 3. otherwise, call genAddr() on lhs, and generate an IR.Store instruction
   //
   static List<IR.Inst> gen(Ast.Assign n, ClassInfo cinfo, Env env) throws Exception {
-    // TODO: implement
     ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
     CodePack rhsPack = gen(n.rhs, cinfo, env);
 
@@ -484,16 +497,7 @@ public class IRGen {
     } else {
       AddrPack addrPack = genAddr(n.lhs, cinfo, env);
 
-      IR.Type type;
-      if (addrPack.type instanceof Ast.BoolType) {
-        type = IR.Type.BOOL;
-      } else if (addrPack.type instanceof Ast.IntType) {
-        type = IR.Type.INT;
-      } else if (addrPack.type instanceof Ast.ObjType) {
-        type = IR.Type.PTR;
-      } else {
-        throw new Error("Unknown type " + addrPack.type);
-      }
+      IR.Type type = toIRType(addrPack.type);
 
       IR.Store store = new IR.Store(type, addrPack.addr, rhsPack.src);
       codes.add(store);
@@ -728,12 +732,17 @@ public class IRGen {
   //   1.2 Add an IR.Load to get its value
   //
   static CodePack gen(Ast.Field n, ClassInfo cinfo, Env env) throws Exception {
-    // TODO: Implement
-    throw new Exception("gen FIELD cinfo, env");
-//    AddrPack addrPack = genAddr(n, cinfo, env);
-//    IR.Load load = new IR.Load(IR.Type.PTR, new IR.Id(n.nm), addrPack.addr);
-//    addrPack.code.add(load);
-//    return new CodePack(new Ast.ObjType(cinfo.name), new IR.Id(n.nm), addrPack.code);
+    ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
+
+    AddrPack addrPack = genAddr(n, cinfo, env);
+    IR.Temp t = new IR.Temp();
+    IR.Load load = new IR.Load(toIRType(addrPack.type), t, addrPack.addr);
+
+    codes.addAll(addrPack.code);
+    codes.add(load);
+
+    CodePack pack = new CodePack(addrPack.type, t, codes);
+    return pack;
   }
   
   // 2. genAddr()
