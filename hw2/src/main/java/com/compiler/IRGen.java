@@ -482,6 +482,7 @@ public class IRGen {
       IR.Move mov = new IR.Move(new IR.Id(((Ast.Id) n.lhs).nm), rhsPack.src);
       codes.add(mov);
     } else {
+      AddrPack addrPack = genAddr(n.lhs, cinfo, env);
       throw new Exception("gen Assign");
     }
 
@@ -683,7 +684,6 @@ public class IRGen {
   //     the allocated space
   //
   static CodePack gen(Ast.NewObj n, ClassInfo cinfo, Env env) throws Exception {
-    // TODO: implement
     ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
     ArrayList<IR.Src>  args = new ArrayList<IR.Src>();
 
@@ -732,8 +732,13 @@ public class IRGen {
   //   2.4 Generate an IR.Addr based on the offset
   //
   static AddrPack genAddr(Ast.Field n, ClassInfo cinfo, Env env) throws Exception {
-    // TODO: Implement
-    throw new Exception("genAddr FIELD cinfo, env");
+    CodePack pack = gen(n.obj, cinfo, env);
+    ClassInfo baseCinfo = classInfos.get(((Ast.ObjType)pack.type).nm);
+
+    int fieldOffset = baseCinfo.fieldOffset(n.nm);
+    IR.Addr addr = new IR.Addr(pack.src, fieldOffset);
+
+    return new AddrPack(new Ast.ObjType(baseCinfo.name), addr, pack.code);
   }
   
   // Id ---
