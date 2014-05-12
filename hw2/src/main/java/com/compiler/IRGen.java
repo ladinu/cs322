@@ -483,7 +483,20 @@ public class IRGen {
       codes.add(mov);
     } else {
       AddrPack addrPack = genAddr(n.lhs, cinfo, env);
-      throw new Exception("gen Assign");
+
+      IR.Type type;
+      if (addrPack.type instanceof Ast.BoolType) {
+        type = IR.Type.BOOL;
+      } else if (addrPack.type instanceof Ast.IntType) {
+        type = IR.Type.INT;
+      } else if (addrPack.type instanceof Ast.ObjType) {
+        type = IR.Type.PTR;
+      } else {
+        throw new Error("Unknown type " + addrPack.type);
+      }
+
+      IR.Store store = new IR.Store(type, addrPack.addr, rhsPack.src);
+      codes.add(store);
     }
 
     return codes;
@@ -735,10 +748,10 @@ public class IRGen {
     CodePack pack = gen(n.obj, cinfo, env);
     ClassInfo baseCinfo = classInfos.get(((Ast.ObjType)pack.type).nm);
 
-    int fieldOffset = baseCinfo.fieldOffset(n.nm);
+    int fieldOffset = IR.Type.PTR.size + baseCinfo.fieldOffset(n.nm);
     IR.Addr addr = new IR.Addr(pack.src, fieldOffset);
 
-    return new AddrPack(new Ast.ObjType(baseCinfo.name), addr, pack.code);
+    return new AddrPack(baseCinfo.fieldType(n.nm), addr, pack.code);
   }
   
   // Id ---
