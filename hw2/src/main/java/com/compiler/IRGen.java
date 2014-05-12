@@ -177,20 +177,6 @@ public class IRGen {
   private static final Ast.Type AstIntType = new Ast.IntType();
   private static final Ast.Type AstBoolType = new Ast.BoolType();
 
-  // Helper methods
-  private static final IR.Type toIRType(Ast.Type t) {
-    if (t instanceof Ast.BoolType) {
-      return IR.Type.BOOL;
-    } else if (t instanceof Ast.IntType) {
-      return IR.Type.INT;
-    } else if (t instanceof Ast.ObjType) {
-      return IR.Type.PTR;
-    } else {
-      throw new Error("Unknown type " + t);
-    }
-  }
-
-
   //------------------------------------------------------------------------------
   // The Main Codegen Routine
   //-------------------------
@@ -259,15 +245,7 @@ public class IRGen {
 
     for (Ast.VarDecl field : n.flds) {
 
-      int fieldSize;
-      if (field.t instanceof Ast.IntType) {
-        fieldSize = IR.Type.INT.size;
-      } else if (field.t instanceof Ast.BoolType) {
-        fieldSize = IR.Type.BOOL.size;
-      } else {
-        fieldSize = IR.Type.PTR.size;
-      }
-
+      int fieldSize = gen(field.t).size;
       size += fieldSize;
 
       if (flag) {
@@ -342,13 +320,8 @@ public class IRGen {
     for (String method : cinfo.vtable) {
       globalList.add(new IR.Global(pnm + "_" + method));
     }
-
-    int heapSize = 0;
-    for (Ast.VarDecl field : n.flds) {
-      heapSize += cinfo.fieldOffset(field.nm);
-    }
-
-    return new IR.Data(new IR.Global("class_" + cinfo.name), heapSize, globalList);
+    int size = cinfo.vtable.size() * IR.Type.PTR.size;
+    return new IR.Data(new IR.Global("class_" + cinfo.name), size, globalList);
   }
 
   // 2. Generate code
@@ -462,18 +435,18 @@ public class IRGen {
     else if (n instanceof Ast.Print)    return gen((Ast.Print) n, cinfo, env);
     else if (n instanceof Ast.Return)   return gen((Ast.Return) n, cinfo, env);
     throw new GenException("Illegal Ast Stmt: " + n);
+
   }
 
   // Block ---
   // Stmt[] stmts;
   //
   static List<IR.Inst> gen(Ast.Block n, ClassInfo cinfo, Env env) throws Exception {
-
-
-    //    ... need code
-    // TODO: implement
-
-    throw new Exception("gen BLOCK");
+    ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
+    for (Ast.Stmt stmt : n.stmts) {
+      codes.addAll(gen(stmt, cinfo, env));
+    }
+    return codes;
   }
 
   // Assign ---
@@ -497,7 +470,7 @@ public class IRGen {
     } else {
       AddrPack addrPack = genAddr(n.lhs, cinfo, env);
 
-      IR.Type type = toIRType(addrPack.type);
+      IR.Type type = gen(addrPack.type);
 
       IR.Store store = new IR.Store(type, addrPack.addr, rhsPack.src);
       codes.add(store);
@@ -537,12 +510,47 @@ public class IRGen {
   //
   static CodePack handleCall(Ast.Exp obj, String name, Ast.Exp[] args, 
 			     ClassInfo cinfo, Env env, boolean retFlag) throws Exception {
+    ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
+    CodePack pack;
+
+    ArrayList<IR.Src> argList = new ArrayList<IR.Src>();
+    pack = gen(obj, cinfo, env);
+
+    codes.addAll(pack.code);
+    argList.add(pack.src);
+
+    for (Ast.Exp e : args) {
+      pack = gen(e, cinfo, env);
+      argList.add(pack.src);
+      codes.addAll(pack.code);
+    }
+
+    ClassInfo tgtCinfo = classInfos.get(((Ast.ObjType)pack.type).nm);
+
+    ClassInfo tgtBaseCinfo = tgtCinfo.methodBaseClass(name);
+
+    int tgtMethodOffset = tgtBaseCinfo.methodOffset(name);
+
+    IR.Temp t0 = new IR.Temp();
+    IR.Temp t1 = new IR.Temp();
+    IR.Temp t2 = (retFlag) ? new IR.Temp() : null;
 
 
-    //    ... need code
-    // TODO: implement
+    IR.Addr addr0 = new IR.Addr(pack.src, tgtMethodOffset);
+    IR.Load load0 = new IR.Load(IR.Type.PTR, t0, addr0);
+    codes.add(load0);
 
-    throw new Exception("handleCall");
+    IR.Addr addr1 = new IR.Addr(t0);
+    IR.Load load1 = new IR.Load(IR.Type.PTR, t1, addr1);
+    codes.add(load1);
+
+    Ast.Type retType = tgtCinfo.methodType(name);
+
+    IR.Call call = new IR.Call(t1, true, argList, t2);
+    codes.add(call);
+
+    CodePack rp = new CodePack(retType, t2, codes);
+    return rp;
   }
 
   // If ---
@@ -736,7 +744,7 @@ public class IRGen {
 
     AddrPack addrPack = genAddr(n, cinfo, env);
     IR.Temp t = new IR.Temp();
-    IR.Load load = new IR.Load(toIRType(addrPack.type), t, addrPack.addr);
+    IR.Load load = new IR.Load(gen(addrPack.type), t, addrPack.addr);
 
     codes.addAll(addrPack.code);
     codes.add(load);
