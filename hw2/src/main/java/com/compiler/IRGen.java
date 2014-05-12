@@ -536,12 +536,25 @@ public class IRGen {
   // (See class notes.)
   //
   static List<IR.Inst> gen(Ast.If n, ClassInfo cinfo, Env env) throws Exception {
+    List<IR.Inst> codes = new ArrayList<IR.Inst>();
+    CodePack p = gen(n.cond, cinfo, env);
 
+    IR.Label L1 = new IR.Label();
 
-    //    ... need code
-    // TODO: implement
+    codes.addAll(p.code);
+    codes.add(new IR.CJump(IR.RelOP.EQ, p.src, IR.FALSE, L1));
+    codes.addAll(gen(n.s1, cinfo, env));
 
-    throw new Exception("gen IF cinfo, env");
+    if (n.s2 == null) {
+      codes.add(new IR.LabelDec(L1.toString()));
+    } else {
+      IR.Label L2 = new IR.Label();
+      codes.add(new IR.Jump(L2));
+      codes.add(new IR.LabelDec(L1.toString()));
+      codes.addAll(gen(n.s2, cinfo, env));
+      codes.add(new IR.LabelDec(L2.toString()));
+    }
+    return codes;
   }
 
   // While ---
@@ -551,12 +564,21 @@ public class IRGen {
   // (See class notes.)
   //
   static List<IR.Inst> gen(Ast.While n, ClassInfo cinfo, Env env) throws Exception {
-
-
-    //    ... need code
     // TODO: implement
+    List<IR.Inst> codes = new ArrayList<IR.Inst>();
 
-    throw new Exception("gen WHILE cinfo, env");
+    IR.Label L1 = new IR.Label();
+    IR.Label L2 = new IR.Label();
+
+    codes.add(new IR.LabelDec(L1.toString()));
+
+    CodePack p = gen(n.cond, cinfo, env);
+    codes.addAll(p.code);
+    codes.add(new IR.CJump(IR.RelOP.EQ, p.src, IR.FALSE, L2));
+    codes.addAll(gen(n.s, cinfo, env));
+    codes.add(new IR.Jump(L1));
+    codes.add(new IR.LabelDec(L2.toString()));
+    return codes;
   }
   
   // Print ---
