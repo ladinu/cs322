@@ -353,6 +353,8 @@ public class IRGen {
   //
   static IR.Func gen(Ast.MethodDecl n, ClassInfo cinfo) throws Exception {
     // Populate the env with params and local vars
+    IR.Temp.reset();
+
     Env env = new Env();
     for (Ast.Param param : n.params) {
       env.put(param.nm, param.t);
