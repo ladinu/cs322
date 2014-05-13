@@ -11,7 +11,6 @@ import java.util.*;
 import java.io.*;
 import com.compiler.ast.*;
 import com.compiler.ir.*;
-import com.sun.org.apache.bcel.internal.classfile.Code;
 
 public class IRGen {
 
@@ -464,17 +463,20 @@ public class IRGen {
 
     codes.addAll(rhsPack.code);
 
-    if (n.lhs instanceof Ast.Id && (env.get(((Ast.Id) n.lhs).nm) != null)) {
+    if (n.lhs instanceof Ast.Id && env.containsKey(((Ast.Id) n.lhs).nm)) {
       IR.Move mov = new IR.Move(new IR.Id(((Ast.Id) n.lhs).nm), rhsPack.src);
       codes.add(mov);
+    } else if (n.lhs instanceof Ast.Id) { // LHS is an Id but not in env
+      Ast.Field field = new Ast.Field(new Ast.This(), ((Ast.Id)n.lhs).nm);
+      AddrPack addrPack = genAddr(field, cinfo, env);
+      IR.Store store = new IR.Store(gen(addrPack.type), addrPack.addr, rhsPack.src);
+      codes.add(store);
     } else {
       AddrPack addrPack = genAddr(n.lhs, cinfo, env);
-
-      IR.Type type = gen(addrPack.type);
-
-      IR.Store store = new IR.Store(type, addrPack.addr, rhsPack.src);
+      IR.Store store = new IR.Store(gen(addrPack.type), addrPack.addr, rhsPack.src);
       codes.add(store);
     }
+
 
     return codes;
   }
@@ -511,7 +513,7 @@ public class IRGen {
   static CodePack handleCall(Ast.Exp obj, String name, Ast.Exp[] args, 
 			     ClassInfo cinfo, Env env, boolean retFlag) throws Exception {
     ArrayList<IR.Inst> codes = new ArrayList<IR.Inst>();
-    CodePack pack;
+    CodePack pack, p;
 
     ArrayList<IR.Src> argList = new ArrayList<IR.Src>();
     pack = gen(obj, cinfo, env);
@@ -520,9 +522,9 @@ public class IRGen {
     argList.add(pack.src);
 
     for (Ast.Exp e : args) {
-      pack = gen(e, cinfo, env);
-      argList.add(pack.src);
-      codes.addAll(pack.code);
+      p = gen(e, cinfo, env);
+      argList.add(p.src);
+      codes.addAll(p.code);
     }
 
     ClassInfo tgtCinfo = classInfos.get(((Ast.ObjType)pack.type).nm);
