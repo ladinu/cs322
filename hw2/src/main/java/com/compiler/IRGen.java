@@ -5,6 +5,13 @@
 //
 // (Starting version.)
 //
+
+// TODO: reset it to this
+//import java.util.*;
+//import java.io.*;
+//import ast.*;
+//import ir.*;
+
 package com.compiler;
 
 import java.util.*;
@@ -238,25 +245,19 @@ public class IRGen {
     }
 
 
-    int size = cinfo.objSize;
-    int offset = 0;
-    boolean flag = true;
-
+    // Compute the field offset
+    int offset = cinfo.objSize;
     for (Ast.VarDecl field : n.flds) {
-
-      int fieldSize = gen(field.t).size;
-      size += fieldSize;
-
-      if (flag) {
-        cinfo.offsets.put(field.nm, 0);
-        flag = false;
-      } else {
-        offset += fieldSize;
-        cinfo.offsets.put(field.nm, offset);
-      }
+      cinfo.offsets.put(field.nm, offset);
+      offset += gen(field.t).size;
     }
 
-    cinfo.objSize = size;
+    // Compute object size
+    for (Ast.VarDecl field : n.flds) {
+      cinfo.objSize += gen(field.t).size;
+    }
+
+
     return cinfo;
   }
 
@@ -540,11 +541,11 @@ public class IRGen {
     IR.Temp t2 = (retFlag) ? new IR.Temp() : null;
 
 
-    IR.Addr addr0 = new IR.Addr(pack.src, tgtMethodOffset);
+    IR.Addr addr0 = new IR.Addr(pack.src);
     IR.Load load0 = new IR.Load(IR.Type.PTR, t0, addr0);
     codes.add(load0);
 
-    IR.Addr addr1 = new IR.Addr(t0);
+    IR.Addr addr1 = new IR.Addr(t0, tgtMethodOffset);
     IR.Load load1 = new IR.Load(IR.Type.PTR, t1, addr1);
     codes.add(load1);
 
@@ -769,7 +770,7 @@ public class IRGen {
     CodePack pack = gen(n.obj, cinfo, env);
     ClassInfo baseCinfo = classInfos.get(((Ast.ObjType)pack.type).nm);
 
-    int fieldOffset = IR.Type.PTR.size + baseCinfo.fieldOffset(n.nm);
+    int fieldOffset = baseCinfo.fieldOffset(n.nm);
     IR.Addr addr = new IR.Addr(pack.src, fieldOffset);
 
     return new AddrPack(baseCinfo.fieldType(n.nm), addr, pack.code);

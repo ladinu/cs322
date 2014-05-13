@@ -22,7 +22,7 @@ public class ReturnTest extends BaseTest{
     String ir = "" +
         "# IR Program\n" +
         "\n" +
-        "data _class_Body (sz=14): _Body_go, _Body_g1, _Body_g2\n" +
+        "data _class_Body (sz=24): _Body_go, _Body_g1, _Body_g2\n" +
         "\n" +
         "_main ()\n" +
         "{\n" +
