@@ -314,11 +314,10 @@ public class IRGen {
   static IR.Data genData(Ast.ClassDecl n, ClassInfo cinfo) throws Exception {
     if (cinfo.isMainClass) return null;
 
-    String pnm  = (cinfo.parent == null) ? cinfo.name : cinfo.parent.name;
     ArrayList<IR.Global> globalList = new ArrayList<IR.Global>();
 
     for (String method : cinfo.vtable) {
-      globalList.add(new IR.Global(pnm + "_" + method));
+      globalList.add(new IR.Global(cinfo.methodBaseClass(method).name + "_" + method));
     }
     int size = cinfo.vtable.size() * IR.Type.PTR.size;
     return new IR.Data(new IR.Global("class_" + cinfo.name), size, globalList);
