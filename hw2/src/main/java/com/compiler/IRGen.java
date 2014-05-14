@@ -391,10 +391,15 @@ public class IRGen {
     for (Ast.Stmt stmt : n.stmts) {
       body.addAll(gen(stmt, cinfo, env));
     }
-    // Check if method return type is void
-    if (cinfo.methodType(n.nm) == null) {
+    // Check if method returns, if not explicitly add a return statement
+    boolean hasReturnStmt = false;
+    for (Ast.Stmt stmt : n.stmts) {
+      if (stmt instanceof Ast.Return ) hasReturnStmt = true;
+    }
+    if (!hasReturnStmt) {
       body.add(new IR.Return(null));
     }
+
     body.add(new IR.LabelDec("End"));
 
     return new IR.Func(funcName, params, locals, body);
