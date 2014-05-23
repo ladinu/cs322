@@ -27,3 +27,6 @@ hw1/hw1.iml
 hw2/.idea/
 hw2/target/
 hw2/hw2.iml
+
+.idea/
+*.iml
