@@ -31,6 +31,7 @@ public class Node {
     if (!n.connectedTo(this))
       throw new Exception("Attempted to disconnect non connected node");
     this.neighbors.remove(n.name);
+    n.neighbors.remove(this.name);
   }
 
   public boolean connectedTo(Node n) {

@@ -19,6 +19,10 @@ public class Graph {
     nodes.put(nodeName, new Node(nodeName));
   }
 
+  public void removeNode(String nodeName) {
+
+  }
+
   public void addEdge(String n1, String n2) throws Exception{
     if (!(nodes.containsKey(n1) && nodes.containsKey(n2))) {
       String err = String.format("Node '%s' and or node '%s' not in graph", n1, n2);

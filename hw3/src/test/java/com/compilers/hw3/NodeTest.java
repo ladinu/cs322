@@ -74,7 +74,9 @@ public class NodeTest {
     Assert.assertTrue(n1.connectedTo(n2));
     n2.disconnect(n1);
     Assert.assertFalse(n1.connectedTo(n2));
+    Assert.assertFalse(n2.connectedTo(n1));
   }
+
 
   @Test
   public void testDegree() throws Exception {
