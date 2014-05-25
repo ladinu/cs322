@@ -44,5 +44,9 @@ public class NodeTest {
 
     Assert.assertTrue(t.isConnectedTo(x));
     Assert.assertTrue(x.isConnectedTo(t));
+
+    Assert.assertFalse(h.isConnectedTo(h));
+    h.connect(h);
+    Assert.assertTrue(h.isConnectedTo(h));
   }
 }
