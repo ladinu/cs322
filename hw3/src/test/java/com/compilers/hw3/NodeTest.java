@@ -11,8 +11,16 @@ public class NodeTest {
     Assert.assertEquals("A", n.getName());
   }
 
+  @Test (expected = Exception.class)
+  public void testConnectException() throws Exception {
+    Node h = new Node("Head");
+    Assert.assertFalse(h.connectedTo(h));
+    h.connect(h);
+    Assert.assertTrue(h.connectedTo(h));
+  }
+
   @Test
-  public void testConnect() {
+  public void testConnect() throws Exception {
     Node h = new Node("Head");
     Node t = new Node("Tail");
     h.connect(t);
@@ -22,7 +30,7 @@ public class NodeTest {
   }
 
   @Test
-  public void testConnectedTo() {
+  public void testConnectedTo() throws Exception {
     Node h = new Node("Head");
     Node t = new Node("Tail");
     Node x = new Node("X");
@@ -44,11 +52,8 @@ public class NodeTest {
 
     Assert.assertTrue(t.connectedTo(x));
     Assert.assertTrue(x.connectedTo(t));
-
-    Assert.assertFalse(h.connectedTo(h));
-    h.connect(h);
-    Assert.assertTrue(h.connectedTo(h));
   }
+
 
   @Test(expected = Exception.class)
   public void testDisconnectNotConnectedNode() throws Exception {
@@ -72,7 +77,7 @@ public class NodeTest {
   }
 
   @Test
-  public void testDegree() {
+  public void testDegree() throws Exception {
     Node n1 = new Node("n1");
     Node n2 = new Node("n2");
     Node n3 = new Node("n3");

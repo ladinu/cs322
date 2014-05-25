@@ -20,15 +20,16 @@ public class Node {
     return neighbors.size();
   }
 
-  public void connect(Node n) {
+  public void connect(Node n) throws Exception {
+    if (n.name.equals(this.name))
+      throw new Exception("Cannot connect node to self");
     this.neighbors.put(n.name, n);
     n.neighbors.put(name, this);
   }
 
   public void disconnect(Node n) throws Exception {
-    if (!n.connectedTo(this)) {
+    if (!n.connectedTo(this))
       throw new Exception("Attempted to disconnect non connected node");
-    }
     this.neighbors.remove(n.name);
   }
 

@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class GraphTest {
   Graph g;
@@ -12,6 +12,12 @@ public class GraphTest {
   @Before
   public void clearGraph() {
     g = new Graph();
+  }
+
+  @Test (expected = UnsupportedOperationException.class)
+  public void testGetNodesImmutability() {
+    g.addNode("A");
+    g.getNodes().put("A", new Node("B"));
   }
 
   @Test
@@ -50,10 +56,9 @@ public class GraphTest {
 
     g.addEdge("A", "B");
 
-    HashMap<String, Node> nmap = g.getNodes();
+    Map<String, Node> nmap = g.getNodes();
 
-   Assert.assertTrue(nmap.get("A").connectedTo(nmap.get("B")));
-   Assert.assertTrue(nmap.get("B").connectedTo(nmap.get("A")));
+    Assert.assertTrue(nmap.get("A").connectedTo(nmap.get("B")));
+    Assert.assertTrue(nmap.get("B").connectedTo(nmap.get("A")));
   }
-
 }
