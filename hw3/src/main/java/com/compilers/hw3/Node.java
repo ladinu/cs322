@@ -16,6 +16,10 @@ public class Node {
     return name;
   }
 
+  public int degree() {
+    return neighbors.size();
+  }
+
   public void connect(Node n) {
     this.neighbors.put(n.name, n);
     n.neighbors.put(name, this);

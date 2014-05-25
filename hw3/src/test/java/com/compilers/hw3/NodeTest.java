@@ -70,4 +70,24 @@ public class NodeTest {
     n2.disconnect(n1);
     Assert.assertFalse(n1.isConnectedTo(n2));
   }
+
+  @Test
+  public void testDegree() {
+    Node n1 = new Node("n1");
+    Node n2 = new Node("n2");
+    Node n3 = new Node("n3");
+    Node n4 = new Node("n4");
+
+    Assert.assertEquals(0, n1.degree());
+
+    n1.connect(n2);
+    n1.connect(n3);
+    n1.connect(n4);
+
+    Assert.assertEquals(3, n1.degree());
+
+    Assert.assertEquals(1, n2.degree());
+    Assert.assertEquals(1, n3.degree());
+    Assert.assertEquals(1, n4.degree());
+  }
 }
