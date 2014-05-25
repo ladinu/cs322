@@ -6,6 +6,6 @@ public class Test01 extends BaseTest {
 
   @Test
   public void test1() throws Exception {
-    testF("/test02.ir", "/test02.s.ref");
+    testF("/example0.ir", "/test02.s.ref");
   }
 }

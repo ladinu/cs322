@@ -30,4 +30,16 @@ public class Graph {
     }
     nodes.get(n1).connect(nodes.get(n2));
   }
+
+  public Node minDegreeNode() {
+    Node minNode = null;
+    int degree = nodes.size();
+    for(Node n : nodes.values()) {
+      if (n.degree() < degree) {
+        minNode = n;
+        degree = n.degree();
+      }
+    }
+    return minNode;
+  }
 }

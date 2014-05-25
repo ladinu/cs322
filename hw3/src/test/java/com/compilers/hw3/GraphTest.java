@@ -3,6 +3,7 @@ package com.compilers.hw3;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import java.util.Map;
 
@@ -42,10 +43,11 @@ public class GraphTest {
     g.addEdge("A", "B");
   }
 
-  @Test(expected = Exception.class)
-  public void testAddEdgeException2() throws Exception {
+  @Test
+  public void testAddEdgeToSelf() throws Exception {
     g.addNode("A");
     g.addEdge("A", "A");
+    Assert.assertEquals(0, g.getNodes().get("A").getNeighbors().size());
   }
 
 
@@ -60,5 +62,24 @@ public class GraphTest {
 
     Assert.assertTrue(nmap.get("A").connectedTo(nmap.get("B")));
     Assert.assertTrue(nmap.get("B").connectedTo(nmap.get("A")));
+  }
+
+  @Test
+  public void testMinDegreeNodeEmptyGraph() throws Exception {
+    Assert.assertNull(g.minDegreeNode());
+  }
+
+  @Test
+  public void testMinDegreeNode() throws Exception {
+    g.addNode("A");
+    g.addNode("B");
+    g.addNode("C");
+    g.addNode("D");
+
+    g.addEdge("A", "B");
+    g.addEdge("A", "C");
+    g.addEdge("A", "D");
+    g.addEdge("B", "C");
+    Assert.assertTrue(g.minDegreeNode().getName().equals("D"));
   }
 }

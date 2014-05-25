@@ -16,39 +16,58 @@ class Assignment {
     Map<IR.Reg,Set<Integer>> liveRanges = Liveness.calculateLiveRanges(liveOutSets);
 
     // REPLACE FROM HERE ....
+    Graph g = new Graph();
+    for(IR.Reg reg : liveRanges.keySet()) {
+      g.addNode(reg.toString());
+    }
+
+    for(Set<IR.Reg> regSet : liveOutSets) {
+      for(IR.Reg reg1 : regSet) {
+        for(IR.Reg reg2 : regSet) {
+          try {
+            g.addEdge(reg1.toString(), reg2.toString());
+          } catch (Exception e) {
+            System.err.println(e);
+            System.exit(1);
+          }
+        }
+      }
+    }
+
+    System.out.println("Test");
 
     // For now, do extremely simplistic allocation: simply allocate registers to
     // IR.Reg's eagerly, in arbitrary order.  Once a register is used, we don't
     // try to use it again, so we will very quickly run out.  
 
     // Keep track of available registers
-    Set<X86.Reg> availableRegs = new HashSet<X86.Reg>();
+//    Set<X86.Reg> availableRegs = new HashSet<X86.Reg>();
     // start by assuming all registers are available
-    for (X86.Reg r : X86.allRegs)
-	availableRegs.add(r);
-    // always rule out special-purpose registers
-    availableRegs.remove(X86.RSP);
-    availableRegs.remove(IR.tempReg1);
-    availableRegs.remove(IR.tempReg2);
-
-    // Work through the list of live IR registers (in arbitrary order)
-    for (Map.Entry<IR.Reg,Set<Integer>> me : liveRanges.entrySet()) {
-      IR.Reg r = me.getKey();
-      Set<Integer> range = me.getValue();
-      X86.Reg treg = findAssignment(availableRegs,
-				    preferences.get(r),
-				    rangeContainsCall(func,range));
-      if (treg == null) {
-	// couldn't find a register
-	System.err.println("oops: out of registers");
-	assert (false);
-      }
-      // We found a register; mark it as unavailable and record assignmenta
-      availableRegs.remove(treg);
-      env.put(r,treg);
-      // DEBUG
-      // System.err.println("allocating " + r + " to " + treg);
-    }
+//    for (X86.Reg r : X86.allRegs)
+//	availableRegs.add(r);
+//    // always rule out special-purpose registers
+//    availableRegs.remove(X86.RSP);
+//    availableRegs.remove(IR.tempReg1);
+//    availableRegs.remove(IR.tempReg2);
+//
+//    // Work through the list of live IR registers (in arbitrary order)
+//    for (Map.Entry<IR.Reg,Set<Integer>> me : liveRanges.entrySet()) {
+//      IR.Reg r = me.getKey();
+//      Set<Integer> range = me.getValue();
+//      X86.Reg treg = findAssignment(availableRegs,
+//				    preferences.get(r),
+//				    rangeContainsCall(func,range));
+//      if (treg == null) {
+//	// couldn't find a register
+//	System.err.println("oops: out of registers");
+//	assert (false);
+//      }
+//      // We found a register; mark it as unavailable and record assignmenta
+//      availableRegs.remove(treg);
+//      env.put(r,treg);
+//      // DEBUG
+//      // System.err.println("allocating " + r + " to " + treg);
+//    }
 
     // ... TO HERE
 

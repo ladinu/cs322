@@ -14,12 +14,12 @@ public class NodeTest {
     Assert.assertEquals("A", n.getName());
   }
 
-  @Test (expected = Exception.class)
-  public void testConnectException() throws Exception {
+  @Test
+  public void testConnectSelf() throws Exception {
     Node h = new Node("Head");
     Assert.assertFalse(h.connectedTo(h));
     h.connect(h);
-    Assert.assertTrue(h.connectedTo(h));
+    Assert.assertFalse(h.connectedTo(h));
   }
 
   @Test

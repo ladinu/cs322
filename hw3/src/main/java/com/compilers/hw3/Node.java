@@ -29,7 +29,7 @@ public class Node {
   // Connect this node an some node n with an undirected edge
   public void connect(Node n) throws Exception {
     if (n.name.equals(this.name))
-      throw new Exception("Cannot connect node to self");
+      return;
     this.neighbors.put(n.name, n);
     n.neighbors.put(name, this);
   }
