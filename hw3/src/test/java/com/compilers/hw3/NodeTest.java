@@ -3,6 +3,9 @@ package com.compilers.hw3;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class NodeTest {
 
   @Test
@@ -96,5 +99,25 @@ public class NodeTest {
     Assert.assertEquals(1, n2.degree());
     Assert.assertEquals(1, n3.degree());
     Assert.assertEquals(1, n4.degree());
+  }
+
+  @Test
+  public void testGetNeighbors() throws Exception {
+    Node n1 = new Node("n1");
+    Node n2 = new Node("n2");
+    Node n3 = new Node("n3");
+    Node n4 = new Node("n4");
+
+    ArrayList<Node> nodes = new ArrayList<Node>();
+
+    nodes.add(n2);
+    nodes.add(n3);
+    nodes.add(n4);
+
+    n1.connect(n2);
+    n1.connect(n3);
+    n1.connect(n4);
+
+    Assert.assertTrue(n1.getNeighbors().values().containsAll(nodes));
   }
 }
