@@ -130,4 +130,20 @@ public class NodeTest {
     n.connect(new Node("b"));
     n.getNeighbors().put("b", new Node("AA"));
   }
+
+  @Test
+  public void testRemoveConnections() throws Exception {
+    Node n1 = new Node("n1");
+    Node n2 = new Node("n2");
+    Node n3 = new Node("n3");
+
+    n1.connect(n2);
+    n1.connect(n3);
+
+    Assert.assertTrue(n1.connectedTo(n2));
+    Assert.assertTrue(n1.connectedTo(n3));
+    Node.removeAllConnections(n1);
+    Assert.assertFalse(n1.connectedTo(n2));
+    Assert.assertFalse(n1.connectedTo(n3));
+  }
 }

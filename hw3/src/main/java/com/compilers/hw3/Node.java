@@ -2,6 +2,7 @@ package com.compilers.hw3;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class Node {
@@ -42,6 +43,13 @@ public class Node {
     this.neighbors.remove(n.name);
     n.neighbors.remove(this.name);
   }
+
+  public static void removeAllConnections(Node n) throws Exception {
+    for (Node neighbor: new HashSet<Node>(n.neighbors.values())) {
+      neighbor.disconnect(n);
+    }
+  }
+
 
   public boolean connectedTo(Node n) {
     return this.neighbors.containsKey(n.name) && n.neighbors.containsKey(name);

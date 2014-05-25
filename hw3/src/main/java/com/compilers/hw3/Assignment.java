@@ -1,4 +1,6 @@
 package com.compilers.hw3; // TODO: remove
+import com.sun.jmx.remote.internal.ArrayQueue;
+
 import java.util.*;
 
 /** Simplistic register assignment **/
@@ -16,11 +18,14 @@ class Assignment {
     Map<IR.Reg,Set<Integer>> liveRanges = Liveness.calculateLiveRanges(liveOutSets);
 
     // REPLACE FROM HERE ....
+
+    // Add every reg in liveRanges to the graph
     Graph g = new Graph();
     for(IR.Reg reg : liveRanges.keySet()) {
       g.addNode(reg.toString());
     }
 
+    // Add edges using the liveOutSets
     for(Set<IR.Reg> regSet : liveOutSets) {
       for(IR.Reg reg1 : regSet) {
         for(IR.Reg reg2 : regSet) {
@@ -32,6 +37,14 @@ class Assignment {
           }
         }
       }
+    }
+
+    ArrayDeque<Node> stack = new ArrayDeque<Node>();
+
+    // Populate the stack
+    while(!g.isEmpty()) {
+      Node n = g.minDegreeNode();
+      stack.push(n);
     }
 
     System.out.println("Test");

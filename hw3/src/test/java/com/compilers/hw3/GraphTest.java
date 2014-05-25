@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Ignore;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class GraphTest {
@@ -65,6 +66,53 @@ public class GraphTest {
   }
 
   @Test
+  public void testHasEdge() throws Exception {
+    g.addNode("a");
+    g.addNode("b");
+
+    Assert.assertFalse(g.hasEdge("a", "b"));
+    g.addEdge("a", "b");
+    Assert.assertTrue(g.hasEdge("a", "b"));
+  }
+
+  @Test (expected = Exception.class)
+  public void testRemoveNodeException() throws Exception {
+    g.removeNode("A");
+  }
+
+  @Test
+  public void testRemoveNode() throws Exception {
+    g.addNode("A");
+    Assert.assertEquals(1, g.getNodes().size());
+    g.removeNode("A");
+    Assert.assertEquals(0, g.getNodes().size());
+  }
+
+  @Test
+  public void testRemoveNodeWithConnection() throws Exception {
+    g.addNode("n1");
+    g.addNode("n2");
+    g.addNode("n3");
+    g.addNode("n4");
+
+    g.addEdge("n1", "n2");
+    g.addEdge("n1", "n3");
+    g.addEdge("n1", "n4");
+
+    Assert.assertEquals(4, g.getNodes().size());
+    g.removeNode("n1");
+    Assert.assertEquals(3, g.getNodes().size());
+
+    Assert.assertFalse(g.hasEdge("n2", "n1"));
+    Assert.assertFalse(g.hasEdge("n3", "n2"));
+    Assert.assertFalse(g.hasEdge("n4", "n3"));
+
+    Assert.assertFalse(g.hasEdge("n1", "n2"));
+    Assert.assertFalse(g.hasEdge("n1", "n3"));
+    Assert.assertFalse(g.hasEdge("n1", "n4"));
+  }
+
+  @Test
   public void testMinDegreeNodeEmptyGraph() throws Exception {
     Assert.assertNull(g.minDegreeNode());
   }
@@ -81,5 +129,12 @@ public class GraphTest {
     g.addEdge("A", "D");
     g.addEdge("B", "C");
     Assert.assertTrue(g.minDegreeNode().getName().equals("D"));
+  }
+
+  @Test
+  public void testIsEmpty() {
+    Assert.assertTrue(g.isEmpty());
+    g.addNode("A");
+    Assert.assertFalse(g.isEmpty());
   }
 }
