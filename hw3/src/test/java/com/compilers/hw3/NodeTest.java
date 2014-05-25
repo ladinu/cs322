@@ -119,5 +119,8 @@ public class NodeTest {
     n1.connect(n4);
 
     Assert.assertTrue(n1.getNeighbors().values().containsAll(nodes));
+
+    nodes.add(n1);
+    Assert.assertFalse(n1.getNeighbors().values().containsAll(nodes));
   }
 }
