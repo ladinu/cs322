@@ -49,4 +49,25 @@ public class NodeTest {
     h.connect(h);
     Assert.assertTrue(h.isConnectedTo(h));
   }
+
+  @Test(expected = Exception.class)
+  public void testDisconnectNotConnectedNode() throws Exception {
+    Node n1 = new Node("n1");
+    Node n2 = new Node("n2");
+
+    Assert.assertFalse(n1.isConnectedTo(n2));
+    n2.disconnect(n1);
+  }
+
+  @Test
+  public void testDisconnect() throws Exception {
+    Node n1 = new Node("n1");
+    Node n2 = new Node("n2");
+
+    n1.connect(n2);
+
+    Assert.assertTrue(n1.isConnectedTo(n2));
+    n2.disconnect(n1);
+    Assert.assertFalse(n1.isConnectedTo(n2));
+  }
 }

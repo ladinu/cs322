@@ -17,11 +17,18 @@ public class Node {
   }
 
   public void connect(Node n) {
-    neighbors.put(n.name, n);
+    this.neighbors.put(n.name, n);
     n.neighbors.put(name, this);
   }
 
+  public void disconnect(Node n) throws Exception {
+    if (!n.isConnectedTo(this)) {
+      throw new Exception("Attempted to disconnect non connected node");
+    }
+    this.neighbors.remove(n.name);
+  }
+
   public boolean isConnectedTo(Node n) {
-    return neighbors.containsKey(n.name) && n.neighbors.containsKey(name);
+    return this.neighbors.containsKey(n.name) && n.neighbors.containsKey(name);
   }
 }
