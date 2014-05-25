@@ -3,7 +3,6 @@ package com.compilers.hw3;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import sun.org.mozilla.javascript.internal.EcmaError;
 
 import java.util.HashMap;
 
@@ -53,8 +52,8 @@ public class GraphTest {
 
     HashMap<String, Node> nmap = g.getNodes();
 
-   Assert.assertTrue(nmap.get("A").isConnectedTo(nmap.get("B")));
-   Assert.assertTrue(nmap.get("B").isConnectedTo(nmap.get("A")));
+   Assert.assertTrue(nmap.get("A").connectedTo(nmap.get("B")));
+   Assert.assertTrue(nmap.get("B").connectedTo(nmap.get("A")));
   }
 
 }

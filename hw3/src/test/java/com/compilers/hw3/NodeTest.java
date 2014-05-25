@@ -17,37 +17,37 @@ public class NodeTest {
     Node t = new Node("Tail");
     h.connect(t);
 
-    Assert.assertTrue(h.isConnectedTo(t));
-    Assert.assertTrue(t.isConnectedTo(h));
+    Assert.assertTrue(h.connectedTo(t));
+    Assert.assertTrue(t.connectedTo(h));
   }
 
   @Test
-  public void testIsConnectedTo() {
+  public void testConnectedTo() {
     Node h = new Node("Head");
     Node t = new Node("Tail");
     Node x = new Node("X");
 
     h.connect(t);
 
-    Assert.assertFalse(t.isConnectedTo(x));
-    Assert.assertFalse(h.isConnectedTo(x));
+    Assert.assertFalse(t.connectedTo(x));
+    Assert.assertFalse(h.connectedTo(x));
 
     h.connect(x);
 
-    Assert.assertTrue(h.isConnectedTo(x));
-    Assert.assertTrue(x.isConnectedTo(h));
+    Assert.assertTrue(h.connectedTo(x));
+    Assert.assertTrue(x.connectedTo(h));
 
-    Assert.assertFalse(t.isConnectedTo(x));
-    Assert.assertFalse(x.isConnectedTo(t));
+    Assert.assertFalse(t.connectedTo(x));
+    Assert.assertFalse(x.connectedTo(t));
 
     t.connect(x);
 
-    Assert.assertTrue(t.isConnectedTo(x));
-    Assert.assertTrue(x.isConnectedTo(t));
+    Assert.assertTrue(t.connectedTo(x));
+    Assert.assertTrue(x.connectedTo(t));
 
-    Assert.assertFalse(h.isConnectedTo(h));
+    Assert.assertFalse(h.connectedTo(h));
     h.connect(h);
-    Assert.assertTrue(h.isConnectedTo(h));
+    Assert.assertTrue(h.connectedTo(h));
   }
 
   @Test(expected = Exception.class)
@@ -55,7 +55,7 @@ public class NodeTest {
     Node n1 = new Node("n1");
     Node n2 = new Node("n2");
 
-    Assert.assertFalse(n1.isConnectedTo(n2));
+    Assert.assertFalse(n1.connectedTo(n2));
     n2.disconnect(n1);
   }
 
@@ -66,9 +66,9 @@ public class NodeTest {
 
     n1.connect(n2);
 
-    Assert.assertTrue(n1.isConnectedTo(n2));
+    Assert.assertTrue(n1.connectedTo(n2));
     n2.disconnect(n1);
-    Assert.assertFalse(n1.isConnectedTo(n2));
+    Assert.assertFalse(n1.connectedTo(n2));
   }
 
   @Test
