@@ -123,4 +123,11 @@ public class NodeTest {
     nodes.add(n1);
     Assert.assertFalse(n1.getNeighbors().values().containsAll(nodes));
   }
+
+  @Test (expected = UnsupportedOperationException.class)
+  public void testGetNeighborsImmutability() throws Exception {
+    Node n = new Node("n");
+    n.connect(new Node("b"));
+    n.getNeighbors().put("b", new Node("AA"));
+  }
 }
