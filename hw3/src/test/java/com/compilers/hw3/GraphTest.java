@@ -137,4 +137,37 @@ public class GraphTest {
     g.addNode("A");
     Assert.assertFalse(g.isEmpty());
   }
+
+  @Test
+  public void testToDotEmpty() {
+    String dot = "" +
+        "graph G {\n" +
+        "}\n";
+    Assert.assertEquals(dot, g.toDot());
+  }
+
+  @Test
+  public void testToDotNotConnected() {
+    String dot = "" +
+        "graph G {\n" +
+        "\tn1;\n" +
+        "}\n";
+    g.addNode("n1");
+    Assert.assertEquals(dot, g.toDot());
+  }
+
+  @Test
+  public void testToDotConnected() throws Exception {
+    String dot = "" +
+        "graph G {\n" +
+        "\tn1 -- n2;\n" +
+        "\tn2 -- n1;\n" +
+        "}\n";
+
+    g.addNode("n1");
+    g.addNode("n2");
+    g.addEdge("n1", "n2");
+
+    Assert.assertEquals(dot, g.toDot());
+  }
 }

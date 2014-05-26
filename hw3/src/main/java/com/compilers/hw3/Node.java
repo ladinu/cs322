@@ -50,8 +50,17 @@ public class Node {
     }
   }
 
-
   public boolean connectedTo(Node n) {
     return this.neighbors.containsKey(n.name) && n.neighbors.containsKey(name);
+  }
+
+  public String toDot() {
+    if (neighbors.isEmpty())
+      return "\t" + name + ";\n";
+    String dot = "";
+    for (Node n : neighbors.values()) {
+      dot += String.format("\t%s -- %s;\n", name, n.name);
+    }
+    return dot;
   }
 }

@@ -146,4 +146,21 @@ public class NodeTest {
     Assert.assertFalse(n1.connectedTo(n2));
     Assert.assertFalse(n1.connectedTo(n3));
   }
+
+  @Test
+  public void testToDot() {
+    Node n = new Node("n");
+    Assert.assertEquals("\tn;\n", n.toDot());
+  }
+
+  @Test
+  public void testToDotConnected() throws Exception {
+    Node n1 = new Node("n1");
+    Node n2 = new Node("n2");
+
+    n1.connect(n2);
+
+    Assert.assertEquals("\tn1 -- n2;\n", n1.toDot());
+    Assert.assertEquals("\tn2 -- n1;\n", n2.toDot());
+  }
 }

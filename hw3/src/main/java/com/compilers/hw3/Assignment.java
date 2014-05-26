@@ -39,12 +39,20 @@ class Assignment {
       }
     }
 
+    String dot = g.toDot();
+
     ArrayDeque<Node> stack = new ArrayDeque<Node>();
 
     // Populate the stack
     while(!g.isEmpty()) {
       Node n = g.minDegreeNode();
       stack.push(n);
+      try {
+        g.removeNode(n.getName());
+      } catch (Exception e) {
+        System.err.println(e);
+        System.exit(1);
+      }
     }
 
     System.out.println("Test");
