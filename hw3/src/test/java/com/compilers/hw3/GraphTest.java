@@ -132,6 +132,17 @@ public class GraphTest {
   }
 
   @Test
+  public void testMinDegreeNodeDisconected() {
+    g.addNode("A");
+    Assert.assertTrue(g.minDegreeNode().getName().equals("A"));
+  }
+
+  @Test
+  public void testMinDegreeNodeEmpty() {
+    Assert.assertNull(g.minDegreeNode());
+  }
+
+  @Test
   public void testIsEmpty() {
     Assert.assertTrue(g.isEmpty());
     g.addNode("A");
@@ -141,7 +152,7 @@ public class GraphTest {
   @Test
   public void testToDotEmpty() {
     String dot = "" +
-        "graph G {\n" +
+        "strict graph G {\n" +
         "}\n";
     Assert.assertEquals(dot, g.toDot());
   }
@@ -149,7 +160,7 @@ public class GraphTest {
   @Test
   public void testToDotNotConnected() {
     String dot = "" +
-        "graph G {\n" +
+        "strict graph G {\n" +
         "\tn1;\n" +
         "}\n";
     g.addNode("n1");
