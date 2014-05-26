@@ -159,7 +159,7 @@ public class GraphTest {
   @Test
   public void testToDotConnected() throws Exception {
     String dot = "" +
-        "graph G {\n" +
+        "strict graph G {\n" +
         "\tn1 -- n2;\n" +
         "\tn2 -- n1;\n" +
         "}\n";

@@ -57,7 +57,7 @@ public class Graph {
   }
 
   public String toDot() {
-    String dot = "graph G {\n";
+    String dot = "strict graph G {\n";
     for (Node n : nodes.values()) {
       dot += n.toDot();
     }
