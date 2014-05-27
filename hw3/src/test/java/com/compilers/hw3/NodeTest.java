@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 public class NodeTest {
 
@@ -162,5 +162,46 @@ public class NodeTest {
 
     Assert.assertEquals("\tn1 -- n2;\n", n1.toDot());
     Assert.assertEquals("\tn2 -- n1;\n", n2.toDot());
+  }
+
+  @Test
+  public void testHasPublicRegisterField() {
+    Node n1 = new Node("n1");
+    Assert.assertNull(n1.x86Reg);
+    n1.x86Reg = X86.EAX;
+    Assert.assertEquals(X86.EAX.toString(), n1.x86Reg.toString());
+  }
+
+  @Test
+  public void testHasRegister() {
+    Node n1 = new Node("n1");
+    Assert.assertFalse(n1.hasReg());
+    n1.x86Reg = X86.EAX;
+    Assert.assertTrue(n1.hasReg());
+  }
+
+  @Test
+  public void testIrReg() {
+    Node n = new Node("n");
+    Assert.assertNull(n.irReg);
+    n.irReg = new IR.Temp(0);
+    Assert.assertNotNull(n.irReg);
+  }
+
+  @Test
+  public void testCopy() throws Exception {
+    Node n = new Node("n");
+    Node c = n.copy();
+
+    Assert.assertEquals(n.color, c.color);
+    Assert.assertTrue(n.irReg == c.irReg);
+    Assert.assertTrue(n.x86Reg == c.x86Reg);
+    Assert.assertEquals(n.getName(), c.getName());
+    for (Map.Entry<String,Node> me : n.getNeighbors().entrySet()) {
+      Assert.assertTrue(c.getNeighbors().containsKey(me.getKey()));
+      Assert.assertTrue(c.getNeighbors().containsValue(me.getValue()));
+    }
+    Node.removeAllConnections(n);
+    Assert.assertFalse(c.getNeighbors().isEmpty());
   }
 }

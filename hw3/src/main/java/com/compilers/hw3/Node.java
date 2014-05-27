@@ -10,11 +10,27 @@ public class Node {
   private String name;
   private HashMap<String, Node> neighbors;
 
+  public X86.Reg x86Reg = null;
+  public IR.Reg irReg = null;
+  public String color = "white";
+
   Node(String name) {
     this.name = name;
     neighbors = new HashMap<String, Node>();
   }
 
+  public Node copy() {
+    Node n = new Node(name);
+    n.x86Reg = x86Reg;
+    n.irReg = irReg;
+    n.color = color;
+    n.neighbors = (HashMap<String, Node>)neighbors.clone();
+    return n;
+  }
+
+  public boolean hasReg() {
+    return x86Reg != null;
+  }
   public String getName() {
     return name;
   }

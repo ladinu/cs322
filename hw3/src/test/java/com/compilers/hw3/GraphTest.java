@@ -28,9 +28,16 @@ public class GraphTest {
   }
 
   @Test
-  public void testAddNode() throws Exception {
+  public void testAddNode() {
     g.addNode("A");
     Assert.assertEquals("Should add nodes to graph", g.getNodes().size(), 1);
+  }
+
+  @Test
+  public void testAddIRNode() {
+    IR.Temp t = new IR.Temp(1);
+    g.addNode(t);
+    Assert.assertTrue(t == g.getNodes().get(t.toString()).irReg);
   }
 
   @Test(expected = Exception.class)
@@ -161,6 +168,7 @@ public class GraphTest {
   public void testToDotNotConnected() {
     String dot = "" +
         "strict graph G {\n" +
+        "\tn1 [style=\"filled\" fillcolor=\"white\"];\n" +
         "\tn1;\n" +
         "}\n";
     g.addNode("n1");
@@ -171,6 +179,8 @@ public class GraphTest {
   public void testToDotConnected() throws Exception {
     String dot = "" +
         "strict graph G {\n" +
+        "\tn1 [style=\"filled\" fillcolor=\"white\"];\n" +
+        "\tn2 [style=\"filled\" fillcolor=\"white\"];\n" +
         "\tn1 -- n2;\n" +
         "\tn2 -- n1;\n" +
         "}\n";
@@ -178,6 +188,20 @@ public class GraphTest {
     g.addNode("n1");
     g.addNode("n2");
     g.addEdge("n1", "n2");
+
+    Assert.assertEquals(dot, g.toDot());
+  }
+
+  @Test
+  public void testToDotColored() {
+    String dot = "" +
+        "strict graph G {\n" +
+        "\tn1 [style=\"filled\" fillcolor=\"red\"];\n" +
+        "\tn1;\n" +
+        "}\n";
+
+    g.addNode("n1");
+    g.getNodes().get("n1").color = "red";
 
     Assert.assertEquals(dot, g.toDot());
   }

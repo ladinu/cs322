@@ -1,5 +1,4 @@
 package com.compilers.hw3; // TODO: remove
-import com.sun.jmx.remote.internal.ArrayQueue;
 
 import java.util.*;
 
@@ -18,7 +17,7 @@ class Assignment {
 
     Graph g = new Graph();
     for(IR.Reg reg : liveRanges.keySet()) {
-      g.addNode(reg.toString());
+      g.addNode(reg);
     }
 
     for(Set<IR.Reg> regSet : liveOutSets) {
@@ -36,12 +35,17 @@ class Assignment {
 
     String dot = g.toDot();
 
-    ArrayDeque<Node> stack = new ArrayDeque<Node>();
+    ArrayDeque<ArrayList<Node>> stack = new ArrayDeque<ArrayList<Node>>();
 
     // Populate the stack
-    while(!g.isEmpty()) {
+    while (!g.isEmpty()) {
+      ArrayList<Node> nodes = new ArrayList<Node>();
       Node n = g.minDegreeNode();
-      stack.push(n);
+      nodes.add(n);
+      for (Node neighbor : n.getNeighbors().values()) {
+        nodes.add(neighbor);
+      }
+      stack.push(nodes);
       try {
         g.removeNode(n.getName());
       } catch (Exception e) {
@@ -49,12 +53,6 @@ class Assignment {
         System.exit(1);
       }
     }
-
-    System.out.println("Test");
-
-    // For now, do extremely simplistic allocation: simply allocate registers to
-    // IR.Reg's eagerly, in arbitrary order.  Once a register is used, we don't
-    // try to use it again, so we will very quickly run out.  
 
     // Keep track of available registers
     Set<X86.Reg> availableRegs = new HashSet<X86.Reg>();
@@ -66,24 +64,30 @@ class Assignment {
     availableRegs.remove(IR.tempReg1);
     availableRegs.remove(IR.tempReg2);
 
-    // Work through the list of live IR registers (in arbitrary order)
-    for (Map.Entry<IR.Reg,Set<Integer>> me : liveRanges.entrySet()) {
-      IR.Reg r = me.getKey();
-      Set<Integer> range = me.getValue();
-      X86.Reg treg = findAssignment(availableRegs,
-      preferences.get(r),
-      rangeContainsCall(func,range));
+    while (!stack.isEmpty()) {
+      HashSet<X86.Reg> regSet = new HashSet<X86.Reg>(availableRegs);
+      HashSet<Node> nodesNeedingRegisters= new HashSet<Node>();
 
-      // couldn't find a register
-      if (treg == null) {
-        System.err.println("oops: out of registers");
-        assert (false);
+      ArrayList<Node> nodes = stack.pop();
+
+      for (Node n : nodes) {
+        if (n.hasReg()) regSet.remove(n.x86Reg); else nodesNeedingRegisters.add(n);
       }
-      // We found a register; mark it as unavailable and record assignmenta
-      availableRegs.remove(treg);
-      env.put(r,treg);
-      // DEBUG
-      // System.err.println("allocating " + r + " to " + treg);
+
+      for (Node n : nodesNeedingRegisters) {
+        X86.Reg reg = findAssignment(
+            regSet,
+            preferences.get(n.irReg),
+            rangeContainsCall(func, liveRanges.get(n.irReg))
+        );
+        // couldn't find a register
+        if (reg == null) {
+          System.err.println("oops: out of registers");
+          assert (false);
+        }
+        regSet.remove(reg);
+        env.put(n.irReg, reg);
+      }
     }
 
     // ... TO HERE
