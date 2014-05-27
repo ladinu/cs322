@@ -1,5 +1,8 @@
 package com.compilers.hw3; // TODO: remove
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
 import java.util.*;
 
 /** Simplistic register assignment **/
@@ -93,10 +96,36 @@ class Assignment {
     // ... TO HERE
 
     // For documentation purposes
-//    System.out.println("# Allocation map");
-//    for (Map.Entry<IR.Reg,X86.Reg> me : env.entrySet())
-//      System.out.println("# " + me.getKey() + "\t" + me.getValue());
-    
+    System.out.println("# Allocation map");
+    for (Map.Entry<IR.Reg,X86.Reg> me : env.entrySet())
+      System.out.println("# " + me.getKey() + "\t" + me.getValue());
+
+    g = new Graph();
+    for(Map.Entry<IR.Reg, X86.Reg> me: env.entrySet()){
+      Node n = new Node(me.getKey().toString());
+      n.x86Reg = me.getValue();
+      n.color = Graph.mapRegtoColor(n.x86Reg);
+      g.addNode(n);
+    }
+
+    for(Set<IR.Reg> regSet : liveOutSets) {
+      for(IR.Reg reg1 : regSet) {
+        for(IR.Reg reg2 : regSet) {
+          try {
+            g.addEdge(reg1.toString(), reg2.toString());
+          } catch (Exception e) {
+            System.err.println(e);
+            System.exit(1);
+          }
+        }
+      }
+    }
+
+    try {
+      FileUtils.writeStringToFile(new File("/Users/ladinu/Desktop/test.dot"), g.toDot());
+    } catch (Exception e) {
+      System.err.println(e);
+    }
     return env;
   }
 

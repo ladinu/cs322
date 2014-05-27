@@ -19,15 +19,6 @@ public class Node {
     neighbors = new HashMap<String, Node>();
   }
 
-  public Node copy() {
-    Node n = new Node(name);
-    n.x86Reg = x86Reg;
-    n.irReg = irReg;
-    n.color = color;
-    n.neighbors = (HashMap<String, Node>)neighbors.clone();
-    return n;
-  }
-
   public boolean hasReg() {
     return x86Reg != null;
   }

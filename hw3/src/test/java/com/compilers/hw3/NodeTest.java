@@ -187,21 +187,4 @@ public class NodeTest {
     n.irReg = new IR.Temp(0);
     Assert.assertNotNull(n.irReg);
   }
-
-  @Test
-  public void testCopy() throws Exception {
-    Node n = new Node("n");
-    Node c = n.copy();
-
-    Assert.assertEquals(n.color, c.color);
-    Assert.assertTrue(n.irReg == c.irReg);
-    Assert.assertTrue(n.x86Reg == c.x86Reg);
-    Assert.assertEquals(n.getName(), c.getName());
-    for (Map.Entry<String,Node> me : n.getNeighbors().entrySet()) {
-      Assert.assertTrue(c.getNeighbors().containsKey(me.getKey()));
-      Assert.assertTrue(c.getNeighbors().containsValue(me.getValue()));
-    }
-    Node.removeAllConnections(n);
-    Assert.assertFalse(c.getNeighbors().isEmpty());
-  }
 }

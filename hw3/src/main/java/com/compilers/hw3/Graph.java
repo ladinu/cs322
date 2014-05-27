@@ -20,6 +20,10 @@ public class Graph {
     return Collections.unmodifiableMap(nodes);
   }
 
+  public void addNode(Node n) {
+    nodes.put(n.getName(), n);
+  }
+
   public void addNode(IR.Reg r) {
     Node n = new Node(r.toString());
     n.irReg = r;
@@ -66,9 +70,10 @@ public class Graph {
   public String toDot() {
     String dot = "strict graph G {\n";
     for (Node n : nodes.values()) {
+      String label = (n.x86Reg == null) ? "none" : n.x86Reg.toString();
       dot += String.format(
-          "\t%s [style=\"filled\" fillcolor=\"%s\"];\n",
-          n.getName(), n.color);
+          "\t%s [xlabel=\"%s\" style=\"filled\" fillcolor=\"%s\"];\n",
+          n.getName(), label, n.color);
     }
     for (Node n : nodes.values()) {
       dot += n.toDot();
@@ -80,38 +85,38 @@ public class Graph {
   public static String mapRegtoColor(X86.Reg reg) {
     String r = reg.toString();
       if (r.equals("%rsi"))
-        return "gold";
+        return "#a6cee3";
       if (r.equals("%rax"))
-        return "brown";
+        return "#1f78b4";
       if (r.equals("%rbp"))
-        return "red";
+        return "#b2df8a";
       if (r.equals("%rbx"))
-        return "yellow";
+        return "#33a02c";
       if (r.equals("%rcx"))
-        return "green";
+        return "#fb9a99";
       if (r.equals("%rdi"))
-        return "pink";
+        return "#e31a1c";
       if (r.equals("%rdx"))
-        return "cyan";
+        return "#fdbf6f";
       if (r.equals("%rsp"))
-        return "aqua";
+        return "#ff7f00";
 
      if(r.equals("%r8") )
-        return "blue";
+        return "#cab2d6";
      if(r.equals("%r9" ))
-        return "indigo";
+        return "#6a3d9a";
      if(r.equals("%r10"))
-        return "silver";
+        return "#ffff99";
      if(r.equals("%r11"))
-        return "purple";
+        return "#b15928";
      if(r.equals("%r12"))
-        return "maroon";
+        return "white";
      if(r.equals("%r13"))
-        return "darkorange";
+        return "black";
      if(r.equals("%r14"))
-        return "darkgreen";
+        return "#8c510a";
      if(r.equals("%r15"))
-        return "darkgray";
+        return "#bababa";
 
     return "black";
   }

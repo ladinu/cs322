@@ -34,6 +34,12 @@ public class GraphTest {
   }
 
   @Test
+  public void testAddNode0() {
+    g.addNode(new Node("a"));
+    Assert.assertEquals(g.getNodes().size(), 1);
+  }
+
+  @Test
   public void testAddIRNode() {
     IR.Temp t = new IR.Temp(1);
     g.addNode(t);
@@ -168,7 +174,7 @@ public class GraphTest {
   public void testToDotNotConnected() {
     String dot = "" +
         "strict graph G {\n" +
-        "\tn1 [style=\"filled\" fillcolor=\"white\"];\n" +
+        "\tn1 [xlabel=\"none\" style=\"filled\" fillcolor=\"white\"];\n" +
         "\tn1;\n" +
         "}\n";
     g.addNode("n1");
@@ -179,8 +185,8 @@ public class GraphTest {
   public void testToDotConnected() throws Exception {
     String dot = "" +
         "strict graph G {\n" +
-        "\tn1 [style=\"filled\" fillcolor=\"white\"];\n" +
-        "\tn2 [style=\"filled\" fillcolor=\"white\"];\n" +
+        "\tn1 [xlabel=\"none\" style=\"filled\" fillcolor=\"white\"];\n" +
+        "\tn2 [xlabel=\"none\" style=\"filled\" fillcolor=\"white\"];\n" +
         "\tn1 -- n2;\n" +
         "\tn2 -- n1;\n" +
         "}\n";
@@ -196,7 +202,7 @@ public class GraphTest {
   public void testToDotColored() {
     String dot = "" +
         "strict graph G {\n" +
-        "\tn1 [style=\"filled\" fillcolor=\"red\"];\n" +
+        "\tn1 [xlabel=\"none\" style=\"filled\" fillcolor=\"red\"];\n" +
         "\tn1;\n" +
         "}\n";
 
