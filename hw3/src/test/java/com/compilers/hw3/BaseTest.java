@@ -1,11 +1,13 @@
 package com.compilers.hw3;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.StandardOutputStreamLog;
 
+import java.io.File;
 import java.io.InputStream;
 
 public class BaseTest {
@@ -29,6 +31,26 @@ public class BaseTest {
     log.clear();
     X86Gen.gen(ir);
     Assert.assertEquals(log.getLog(), expected);
+  }
+
+  public void justRun(int num) throws Exception {
+    String irPath = String.format("/test%02d.ir", num);
+    String sPath  = String.format("/test%02d.s.ref", num);
+    String dPath  = String.format("/Users/ladinu/Desktop/out/test%02d.dot", num);
+
+    log.clear();
+    X86Gen.gen(r(irPath));
+
+    String irCode = log.getLog();
+    String sCode = r(sPath);
+
+    String dot = FileUtils.readFileToString(
+        new File("/Users/ladinu/Desktop/test.dot"));
+
+    if (!irCode.equals(sCode))
+      dPath = dPath + ".err";
+
+    FileUtils.writeStringToFile(new File(dPath), dot);
   }
 
   // Read a file and return its content as a string

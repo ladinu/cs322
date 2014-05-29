@@ -74,7 +74,11 @@ class Assignment {
       ArrayList<Node> nodes = stack.pop();
 
       for (Node n : nodes) {
-        if (n.hasReg()) regSet.remove(n.x86Reg); else nodesNeedingRegisters.add(n);
+        if (n.hasReg()) {
+          regSet.remove(n.x86Reg);
+        } else {
+          nodesNeedingRegisters.add(n);
+        }
       }
 
       for (Node n : nodesNeedingRegisters) {
@@ -83,6 +87,7 @@ class Assignment {
             preferences.get(n.irReg),
             rangeContainsCall(func, liveRanges.get(n.irReg))
         );
+        n.x86Reg = reg;
         // couldn't find a register
         if (reg == null) {
           System.err.println("oops: out of registers");
@@ -108,9 +113,9 @@ class Assignment {
       g.addNode(n);
     }
 
-    for(Set<IR.Reg> regSet : liveOutSets) {
-      for(IR.Reg reg1 : regSet) {
-        for(IR.Reg reg2 : regSet) {
+    for(Set<IR.Reg> rSet : liveOutSets) {
+      for(IR.Reg reg1 : rSet) {
+        for(IR.Reg reg2 : rSet) {
           try {
             g.addEdge(reg1.toString(), reg2.toString());
           } catch (Exception e) {
@@ -121,8 +126,10 @@ class Assignment {
       }
     }
 
+    dot = g.toDot();
     try {
-      FileUtils.writeStringToFile(new File("/Users/ladinu/Desktop/test.dot"), g.toDot());
+      String fname = "/Users/ladinu/Desktop/test.dot";
+      FileUtils.writeStringToFile(new File(fname), g.toDot());
     } catch (Exception e) {
       System.err.println(e);
     }
