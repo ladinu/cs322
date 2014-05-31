@@ -38,17 +38,18 @@ class Assignment {
 
     String dot = g.toDot();
 
-    ArrayDeque<ArrayList<Node>> stack = new ArrayDeque<ArrayList<Node>>();
+    ArrayDeque<Pair> stack = new ArrayDeque<Pair>();
 
     // Populate the stack
     while (!g.isEmpty()) {
-      ArrayList<Node> nodes = new ArrayList<Node>();
+      ArrayList<Node> neighbors = new ArrayList<Node>();
+
       Node n = g.minDegreeNode();
-      nodes.add(n);
       for (Node neighbor : n.getNeighbors().values()) {
-        nodes.add(neighbor);
+        neighbors.add(neighbor);
       }
-      stack.push(nodes);
+      Pair p = new Pair(n, neighbors);
+      stack.push(p);
       try {
         g.removeNode(n.getName());
       } catch (Exception e) {
@@ -69,33 +70,24 @@ class Assignment {
 
     while (!stack.isEmpty()) {
       HashSet<X86.Reg> regSet = new HashSet<X86.Reg>(availableRegs);
-      HashSet<Node> nodesNeedingRegisters= new HashSet<Node>();
+      Pair p = stack.pop();
+      Node node = p.getNode();
 
-      ArrayList<Node> nodes = stack.pop();
-
-      for (Node n : nodes) {
-        if (n.hasReg()) {
+      for (Node n : p.getNeighbors()) {
           regSet.remove(n.x86Reg);
-        } else {
-          nodesNeedingRegisters.add(n);
-        }
       }
 
-      for (Node n : nodesNeedingRegisters) {
-        X86.Reg reg = findAssignment(
-            regSet,
-            preferences.get(n.irReg),
-            rangeContainsCall(func, liveRanges.get(n.irReg))
-        );
-        n.x86Reg = reg;
-        // couldn't find a register
-        if (reg == null) {
-          System.err.println("oops: out of registers");
-          assert (false);
-        }
-        regSet.remove(reg);
-        env.put(n.irReg, reg);
+      X86.Reg reg = findAssignment(
+          regSet,
+          preferences.get(node.irReg),
+          rangeContainsCall(func, liveRanges.get(node.irReg))
+      );
+      node.x86Reg = reg;
+      if (reg == null) {
+        System.err.println("oops: out of registers");
+        assert (false);
       }
+      env.put(node.irReg, reg);
     }
 
     // ... TO HERE

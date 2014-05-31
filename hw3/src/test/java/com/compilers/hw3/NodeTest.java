@@ -154,6 +154,12 @@ public class NodeTest {
   }
 
   @Test
+  public void testToString() {
+    Node n = new Node("n");
+    Assert.assertEquals("n", n.toString());
+  }
+
+  @Test
   public void testToDotConnected() throws Exception {
     Node n1 = new Node("n1");
     Node n2 = new Node("n2");

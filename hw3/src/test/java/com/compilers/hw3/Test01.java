@@ -6,7 +6,7 @@ public class Test01 extends BaseTest {
 
   @Test
   public void test1() throws Exception {
-    int num = 12;
+    int num = 3;
     String ir = String.format("/test%02d.ir", num);
     String s = String.format("/test%02d.s.ref", num);
     testF(ir, s);

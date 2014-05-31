@@ -61,6 +61,10 @@ public class Node {
     return this.neighbors.containsKey(n.name) && n.neighbors.containsKey(name);
   }
 
+  public String toString() {
+    return name;
+  }
+
   public String toDot() {
     if (neighbors.isEmpty())
       return "\t" + name + ";\n";
