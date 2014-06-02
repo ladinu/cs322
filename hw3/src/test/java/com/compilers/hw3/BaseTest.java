@@ -30,13 +30,14 @@ public class BaseTest {
   public void test(String ir, String expected) throws Exception {
     log.clear();
     X86Gen.gen(ir);
-    Assert.assertEquals(log.getLog(), expected);
+    Assert.assertEquals(expected, log.getLog());
   }
 
   public void justRun(int num) throws Exception {
     String irPath = String.format("/test%02d.ir", num);
     String sPath  = String.format("/test%02d.s.ref", num);
     String dPath  = String.format("/Users/ladinu/Desktop/out/test%02d.dot", num);
+    String sPath2  = String.format("/Users/ladinu/Desktop/out/s/actual/test%02d.s", num);
 
     log.clear();
     X86Gen.gen(r(irPath));
@@ -51,6 +52,7 @@ public class BaseTest {
       dPath = dPath + ".err";
 
     FileUtils.writeStringToFile(new File(dPath), dot);
+    FileUtils.writeStringToFile(new File(sPath2), irCode);
   }
 
   // Read a file and return its content as a string

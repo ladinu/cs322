@@ -36,8 +36,6 @@ class Assignment {
       }
     }
 
-    String dot = g.toDot();
-
     ArrayDeque<Pair> stack = new ArrayDeque<Pair>();
 
     // Populate the stack
@@ -58,29 +56,35 @@ class Assignment {
       }
     }
 
-    // Keep track of available registers
-    Set<X86.Reg> availableRegs = new HashSet<X86.Reg>();
-    // start by assuming all registers are available
-    for (X86.Reg r : X86.allRegs)
-      availableRegs.add(r);
-    // always rule out special-purpose registers
-    availableRegs.remove(X86.RSP);
-    availableRegs.remove(IR.tempReg1);
-    availableRegs.remove(IR.tempReg2);
 
     while (!stack.isEmpty()) {
-      HashSet<X86.Reg> regSet = new HashSet<X86.Reg>(availableRegs);
+      // Keep track of available registers
+      Set<X86.Reg> availableRegs = new HashSet<X86.Reg>();
+      // start by assuming all registers are available
+      for (X86.Reg r : X86.allRegs)
+        availableRegs.add(r);
+      // always rule out special-purpose registers
+      availableRegs.remove(X86.RSP);
+      availableRegs.remove(IR.tempReg1);
+      availableRegs.remove(IR.tempReg2);
+
       Pair p = stack.pop();
       Node node = p.getNode();
 
+
       for (Node n : p.getNeighbors()) {
-          regSet.remove(n.x86Reg);
+        if (env.containsKey(n.irReg)) {
+          availableRegs.remove(env.get(n.irReg));
+        }
       }
 
+      X86.Reg r = preferences.get(node.irReg);
+      Set<Integer> s = liveRanges.get(node.irReg);
+
       X86.Reg reg = findAssignment(
-          regSet,
-          preferences.get(node.irReg),
-          rangeContainsCall(func, liveRanges.get(node.irReg))
+          availableRegs,
+          r,
+          rangeContainsCall(func, s)
       );
       node.x86Reg = reg;
       if (reg == null) {
@@ -97,34 +101,6 @@ class Assignment {
     for (Map.Entry<IR.Reg,X86.Reg> me : env.entrySet())
       System.out.println("# " + me.getKey() + "\t" + me.getValue());
 
-    g = new Graph();
-    for(Map.Entry<IR.Reg, X86.Reg> me: env.entrySet()){
-      Node n = new Node(me.getKey().toString());
-      n.x86Reg = me.getValue();
-      n.color = Graph.mapRegtoColor(n.x86Reg);
-      g.addNode(n);
-    }
-
-    for(Set<IR.Reg> rSet : liveOutSets) {
-      for(IR.Reg reg1 : rSet) {
-        for(IR.Reg reg2 : rSet) {
-          try {
-            g.addEdge(reg1.toString(), reg2.toString());
-          } catch (Exception e) {
-            System.err.println(e);
-            System.exit(1);
-          }
-        }
-      }
-    }
-
-    dot = g.toDot();
-    try {
-      String fname = "/Users/ladinu/Desktop/test.dot";
-      FileUtils.writeStringToFile(new File(fname), g.toDot());
-    } catch (Exception e) {
-      System.err.println(e);
-    }
     return env;
   }
 
