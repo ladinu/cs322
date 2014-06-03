@@ -318,6 +318,21 @@ class IR {
       if (op instanceof ArithOP) {
         switch ((ArithOP) op) {
           case ADD:
+          {
+            X86.Reg mdest = dst.gen_dest_operand();
+            if (mdest == null) // dead assignment
+              break;
+            X86.Operand mright = src2.gen_source_operand(true,tempReg1);
+            X86.Operand mleft = src1.gen_source_operand(true,tempReg2);
+            // Move right operand out of the way if necessary.
+            if (mright.equals(mdest)) {
+              X86.emit2(op.X86_name() + X86.Size.Q, mleft, mright);
+              break;
+            }
+            X86.emitMov(X86.Size.Q,mleft,mdest);
+            X86.emit2(op.X86_name() + X86.Size.Q,mright,mdest);
+            break;
+          }
           case SUB:
           case MUL:
           case AND:
@@ -334,8 +349,8 @@ class IR {
             }
             X86.Operand mleft = src1.gen_source_operand(true,tempReg2);
             X86.emitMov(X86.Size.Q,mleft,mdest);
-            if ((ArithOP) op == ArithOP.MUL && mright instanceof X86.Imm && ((X86.Imm)mright).i == 4) {
-              X86.emit2("sal"+X86.Size.Q, new X86.Imm(2), mdest);
+            if (op == ArithOP.MUL && mright instanceof X86.Imm && ((X86.Imm)mright).i == 4) {
+              X86.emit2("salq", new X86.Imm(2), mdest);
               break;
             }
             X86.emit2(op.X86_name() + X86.Size.Q,mright,mdest);

@@ -37,7 +37,7 @@ public class BaseTest {
     String irPath = String.format("/test%02d.ir", num);
     String sPath  = String.format("/test%02d.s.ref", num);
     String dPath  = String.format("/Users/ladinu/Desktop/out/test%02d.dot", num);
-    String sPath2  = String.format("/Users/ladinu/Desktop/out/s/actual/test%02d.s", num);
+    String sPath2  = String.format("/Users/ladinu/Desktop/test/actual/test%02d.s", num);
 
     log.clear();
     X86Gen.gen(r(irPath));

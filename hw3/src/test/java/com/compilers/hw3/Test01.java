@@ -6,12 +6,12 @@ public class Test01 extends BaseTest {
 
   @Test
   public void test1() throws Exception {
-    int num = 38;
-    String ir = String.format("/test%02d.ir", num);
-    String s = String.format("/test%02d.s.ref", num);
-    testF(ir, s);
-//    for(int i = 1; i < 49; i++) {
-//      justRun(i);
-//    }
+//    int num = 38;
+//    String ir = String.format("/test%02d.ir", num);
+//    String s = String.format("/test%02d.s.ref", num);
+//    testF(ir, s);
+    for(int i = 1; i < 49; i++) {
+      justRun(i);
+    }
   }
 }
