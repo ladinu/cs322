@@ -7,8 +7,8 @@ class X86 {
   // generate assembly name corresponding to C name 
   static String globalize(String s) {
     //modify depending on environment!!    
-    // return "_" + s;   // appropriate for MacOS
-    return s;            // appropriate for linux
+    return "_" + s;   // appropriate for MacOS
+//    return s;            // appropriate for linux
   }
 
   // size specifiers

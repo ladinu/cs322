@@ -334,6 +334,10 @@ class IR {
             }
             X86.Operand mleft = src1.gen_source_operand(true,tempReg2);
             X86.emitMov(X86.Size.Q,mleft,mdest);
+            if ((ArithOP) op == ArithOP.MUL && mright instanceof X86.Imm && ((X86.Imm)mright).i == 4) {
+              X86.emit2("sal"+X86.Size.Q, new X86.Imm(2), mdest);
+              break;
+            }
             X86.emit2(op.X86_name() + X86.Size.Q,mright,mdest);
             break;
           }
